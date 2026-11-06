@@ -1,0 +1,11 @@
+{
+  "appId": "com.nhathoonline.game",
+  "appName": "Nha Tho Online",
+  "webDir": "public",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}

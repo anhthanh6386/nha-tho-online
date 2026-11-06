@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Nhà Thờ Online</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#1a2340">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Nha Tho Online">
+<link rel="stylesheet" href="/style.css?v=102">
+<script src="/socket.io.min.js"></script>
+<script src="/server-config.js"></script>
+<script src="/i18n.js?v=102"></script>
+<script type="importmap">{ "imports": { "three": "/three.module.js" } }</script>
+</head>
+<body>
+<div id="login"><div class="login-card">
+<div class="logo">NHÀ THỜ</div>
+<h1 data-i18n="app_name">Nhà Thờ Online</h1>
+<p class="sub" data-i18n="login_sub">Vào nhà thờ 3D cùng mọi người — mobile</p>
+<input id="name" maxlength="20" data-i18n-ph="name_ph" placeholder="Tên của bạn" autocomplete="off">
+<input id="gx" maxlength="24" data-i18n-ph="gx_ph" placeholder="Mã giáo xứ (vd TANBINH)" autocomplete="off" style="margin-top:8px">
+<div class="ao-row" id="aoRow">
+<button data-ao="xanh" class="ao sel" data-i18n="ao_xanh">Xanh</button>
+<button data-ao="trang" class="ao" data-i18n="ao_trang">Trắng</button>
+<button data-ao="den" class="ao" data-i18n="ao_den">Đen</button>
+<button data-ao="do" class="ao" data-i18n="ao_do">Đỏ</button>
+<button data-ao="tim" class="ao" data-i18n="ao_tim">Tím</button>
+</div>
+<button id="joinBtn" data-i18n="join">Vào Nhà Thờ</button>
+<div class="lang-row">
+<button class="lang-btn sel" data-lang="vi" data-i18n="lang_vi">🇻🇳 Tiếng Việt</button>
+<button class="lang-btn" data-lang="en" data-i18n="lang_en">🇺🇸 English</button>
+</div>
+</div></div>
+<div id="game" class="hidden">
+<canvas id="c"></canvas>
+<div id="topbar"><div id="online">1</div><div id="zonePill">Phố</div><div id="levelPill" title="Cấp độ đức tin">Lv1 · 0✦</div><button id="massBtn" data-i18n-title="mass_big" title="GIỜ KINH CHUNG 20h">⛪</button><button id="bellBtn" data-i18n-title="bell_title" title="Rung chuông nhà thờ">🔔</button><button id="rosaryBtn" data-i18n-title="rosary_title" title="Lần hạt Mân Côi">📿</button><button id="confessBtn" data-i18n-title="confess_title" title="Tòa xưng tội">💜</button><button id="candleTopBtn" data-i18n-title="candle_title" title="Tường nến nguyện">🕯️</button><button id="boardBtn" data-i18n-title="board_title" title="BXH giáo xứ">🏆</button><button id="questBtn" data-i18n-title="quest_title" title="Nhiệm vụ">📜</button><button id="mapBtn" title="Bản đồ">🗺️</button><button id="langBtn" title="Language / Ngôn ngữ">🌐</button><button id="soundBtn" title="Âm thanh">🔊</button></div>
+<div id="massBar" class="hidden"><span id="massTxt">Giờ kinh chung</span><button id="massGo" data-i18n="mass_join">Vào dự lễ →</button><button id="massCheckin" data-i18n="mass_checkin">Điểm danh dự lễ</button><button id="massClose" title="Thu gọn">✕</button></div>
+<div id="litPanel" class="hidden"><div id="litHead"><span id="litPriest">Cha xướng...</span><button id="litClose" title="Thu gọn">✕</button></div><div id="litOpts"></div><div id="litTimer"></div></div>
+<div id="zoneMenu" class="hidden"><button data-zone="street">🏙️ Phố Giáo Xứ</button><button data-zone="church-1">⛪ Đức Bà Paris</button><button data-zone="church-2">⛪ Vatican</button><button data-zone="church-3">⛪ Sagrada Familia</button></div>
+<canvas id="minimap" width="132" height="76"></canvas>
+<div id="guideArrow" class="hidden"><span id="guideTxt"></span></div>
+<div id="portalTip" class="hidden"><span id="portalTxt">Vào Nhà Thờ</span><button id="portalBtn">Vào →</button></div>
+<div id="bubble-layer"></div>
+<div id="prayBar" class="hidden"><div id="prayFill"></div><span id="prayTxt">Tĩnh nguyện...</span></div>
+<div id="stamina"><div id="staminaFill"></div></div>
+<div id="joystick"><div id="stick"></div></div>
+<div id="actions">
+<button data-act="cau-nguyen" data-i18n-title="act_pray" title="Quỳ cầu nguyện">🙏<span data-i18n="act_pray">Cầu nguyện</span></button>
+<button data-act="hat" title="Hát Alleluia">🎵<span data-i18n="act_hat">Hát</span></button>
+<button data-act="chao" title="Chào bình an">👋<span data-i18n="act_chao">Chào</span></button>
+<button data-act="amen" title="Amen">✝️<span>Amen</span></button>
+</div>
+<div id="moveBtns"><button id="sprintBtn">🏃<span data-i18n="move_run">Chạy</span></button><button id="jumpBtn">⬆<span data-i18n="move_jump">Nhảy</span></button></div>
+<div id="chatbar"><input id="chat" maxlength="60" data-i18n-ph="chat_ph" placeholder="Lời nguyện..." autocomplete="off"><button id="send" data-i18n="send">Gửi</button></div>
+<div id="questPanel" class="hidden"><div id="questHead"><span data-i18n="quest_title">📜 Nhiệm vụ</span> <button id="questClose">✕</button></div><div id="questList"></div><div id="checkinRow"><button id="checkinBtn" data-i18n="checkin">🎁 Điểm danh hôm nay</button><span id="streakTxt"></span></div></div>
+<div id="candlePanel" class="hidden"><div id="boardHead"><span data-i18n="candle_title">🕯️ Tường Nến Nguyện</span> <button id="candleClose">✕</button></div><div id="boardList2"></div><div id="candleRow"><input id="candleTxt" maxlength="50" data-i18n-ph="candle_ph" placeholder="Viết ý nguyện cho ngọn nến..."><button id="candleBtn" data-i18n="candle_btn">🕯️ Thắp nến +5✦</button></div></div>
+<div id="boardPanel" class="hidden"><div id="boardHead"><span data-i18n="board_title">🏆 BXH Giáo xứ</span> <button id="boardClose">✕</button></div><div id="boardTabs"><button data-tab="gx" class="sel" data-i18n="tab_gx">Giáo xứ</button><button data-tab="me" data-i18n="tab_me">Cá nhân</button><button data-tab="mygx" data-i18n="tab_mygx">GX của tôi</button></div><div id="boardList"></div><div id="boardFoot"></div></div>
+<div id="rosaryPanel" class="hidden"><div id="rosaryHead"><span data-i18n="rosary_title">📿 Lần Hạt Mân Côi</span> <button id="rosaryClose">✕</button></div><div id="rosaryMyst"></div><div id="rosaryBeads"></div><div id="rosaryText"></div><div id="rosaryRow"><button id="rosaryNext" data-i18n="rosary_next">📿 Lần 1 hạt</button><span id="rosaryProg"></span></div></div>
+<div id="confessPanel" class="hidden"><div id="confessHead"><span data-i18n="confess_title">💜 Tòa Xưng Tội</span> <button id="confessClose">✕</button></div><div id="confessBody"></div><div id="confessRow"><button id="confessNext" data-i18n="confess_start">Bắt đầu xét mình</button></div></div>
+<div id="toast" class="hidden"></div>
+</div>
+<script type="module" src="/client.js?v=102"></script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
