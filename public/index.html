@@ -11,10 +11,10 @@
 <meta name="theme-color" content="#1a2340">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="Nha Tho Online">
-<link rel="stylesheet" href="/style.css?v=102">
+<link rel="stylesheet" href="/style.css?v=104">
 <script src="/socket.io.min.js"></script>
 <script src="/server-config.js"></script>
-<script src="/i18n.js?v=102"></script>
+<script src="/i18n.js?v=103"></script>
 <script type="importmap">{ "imports": { "three": "/three.module.js" } }</script>
 </head>
 <body>
@@ -39,8 +39,11 @@
 </div></div>
 <div id="game" class="hidden">
 <canvas id="c"></canvas>
-<div id="topbar"><div id="online">1</div><div id="zonePill">Phố</div><div id="levelPill" title="Cấp độ đức tin">Lv1 · 0✦</div><button id="massBtn" data-i18n-title="mass_big" title="GIỜ KINH CHUNG 20h">⛪</button><button id="bellBtn" data-i18n-title="bell_title" title="Rung chuông nhà thờ">🔔</button><button id="rosaryBtn" data-i18n-title="rosary_title" title="Lần hạt Mân Côi">📿</button><button id="confessBtn" data-i18n-title="confess_title" title="Tòa xưng tội">💜</button><button id="candleTopBtn" data-i18n-title="candle_title" title="Tường nến nguyện">🕯️</button><button id="boardBtn" data-i18n-title="board_title" title="BXH giáo xứ">🏆</button><button id="questBtn" data-i18n-title="quest_title" title="Nhiệm vụ">📜</button><button id="mapBtn" title="Bản đồ">🗺️</button><button id="langBtn" title="Language / Ngôn ngữ">🌐</button><button id="soundBtn" title="Âm thanh">🔊</button></div>
+<div id="topbar"><div id="online">1</div><div id="zonePill">Phố</div><div id="levelPill" title="Cấp độ đức tin">Lv1 · 0✦</div><button id="massBtn" data-i18n-title="mass_big" title="GIỜ KINH CHUNG 20h">⛪</button><button id="bellBtn" data-i18n-title="bell_title" title="Rung chuông nhà thờ">🔔</button><button id="rosaryBtn" data-i18n-title="rosary_title" title="Lần hạt Mân Côi">📿</button><button id="confessBtn" data-i18n-title="confess_title" title="Tòa xưng tội">💜</button><button id="candleTopBtn" data-i18n-title="candle_title" title="Tường nến nguyện">🕯️</button><button id="boardBtn" data-i18n-title="board_title" title="BXH giáo xứ">🏆</button><button id="questBtn" data-i18n-title="quest_title" title="Nhiệm vụ">📜</button><button id="mapBtn" title="Bản đồ">🗺️</button><button id="helpBtn" title="Hướng dẫn / Tutorial">?</button><button id="langBtn" title="Language / Ngôn ngữ">🌐</button><button id="soundBtn" title="Âm thanh">🔊</button></div>
 <div id="massBar" class="hidden"><span id="massTxt">Giờ kinh chung</span><button id="massGo" data-i18n="mass_join">Vào dự lễ →</button><button id="massCheckin" data-i18n="mass_checkin">Điểm danh dự lễ</button><button id="massClose" title="Thu gọn">✕</button></div>
+<div id="graceBar" class="hidden"><span id="graceTxt">🌧️ Mưa ơn lành · x2 mọi ✦</span></div>
+<div id="comboPill" class="hidden"></div>
+<div id="quizPanel" class="hidden"><div id="quizHead"><span id="quizTitle">📖 Đố Kinh Thánh</span><span id="quizTimer"></span></div><div id="quizQ"></div><div id="quizOpts"></div></div>
 <div id="litPanel" class="hidden"><div id="litHead"><span id="litPriest">Cha xướng...</span><button id="litClose" title="Thu gọn">✕</button></div><div id="litOpts"></div><div id="litTimer"></div></div>
 <div id="zoneMenu" class="hidden"><button data-zone="street">🏙️ Phố Giáo Xứ</button><button data-zone="church-1">⛪ Đức Bà Paris</button><button data-zone="church-2">⛪ Vatican</button><button data-zone="church-3">⛪ Sagrada Familia</button></div>
 <canvas id="minimap" width="132" height="76"></canvas>
@@ -64,8 +67,10 @@
 <div id="rosaryPanel" class="hidden"><div id="rosaryHead"><span data-i18n="rosary_title">📿 Lần Hạt Mân Côi</span> <button id="rosaryClose">✕</button></div><div id="rosaryMyst"></div><div id="rosaryBeads"></div><div id="rosaryText"></div><div id="rosaryRow"><button id="rosaryNext" data-i18n="rosary_next">📿 Lần 1 hạt</button><span id="rosaryProg"></span></div></div>
 <div id="confessPanel" class="hidden"><div id="confessHead"><span data-i18n="confess_title">💜 Tòa Xưng Tội</span> <button id="confessClose">✕</button></div><div id="confessBody"></div><div id="confessRow"><button id="confessNext" data-i18n="confess_start">Bắt đầu xét mình</button></div></div>
 <div id="toast" class="hidden"></div>
+<div id="tourOverlay" class="hidden"></div>
+<div id="tourCard" class="hidden"><div id="tourTitle">👋 Tour tân thủ</div><div id="tourDesc"></div><div id="tourDots"></div><div id="tourRow"><button id="tourSkip">Bỏ qua</button><button id="tourBack">←</button><button id="tourNext">Tiếp →</button></div></div>
 </div>
-<script type="module" src="/client.js?v=102"></script>
+<script type="module" src="/client.js?v=113"></script>
 <script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {

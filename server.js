@@ -70,7 +70,7 @@ function massSnapshot() {
   const left = mass.active ? Math.max(0, mass.endsAt - now) : 0;
   let inChurch = 0;
   try { for (const p of players.values()) if (p.zone !== 'street') inChurch++; } catch (e) {}
-  return { active: mass.active, kind: mass.kind, left, nextIn: nextMassIn(), inChurch, online: players.size };
+  return { active: mass.active, kind: mass.kind, left, nextIn: nextMassIn(), inChurch, online: players.size, grace: graceSnapshot() };
 }
 function startMass(kind, mins) {
   const now = Date.now();
@@ -101,8 +101,104 @@ setInterval(() => {
     if (mass.active) broadcastLit(false);
   } catch (e) {}
 }, 2000);
+// --- Muon on lanh: su kien cong dong ngau nhien, moi hanh dong x2 + orb nhat duoc ---
+let grace = { active: false, endsAt: 0, startedAt: 0 };
+function graceSnapshot() {
+  const now = Date.now();
+  const left = grace.active ? Math.max(0, grace.endsAt - now) : 0;
+  return { active: grace.active, left };
+}
+function startGrace(secs) {
+  const now = Date.now();
+  grace = { active: true, endsAt: now + secs * 1000, startedAt: now };
+  try { io.emit('grace', graceSnapshot()); } catch (e) {}
+}
+function stopGrace() {
+  grace = { active: false, endsAt: 0, startedAt: 0 };
+  try { io.emit('grace', graceSnapshot()); } catch (e) {}
+}
+let nextGraceAt = Date.now() + 25 * 1000; // tran dau sau ~25s de nguoi choi moi gap ngay
+setInterval(() => {
+  try {
+    const now = Date.now();
+    if (grace.active && now >= grace.endsAt) { stopGrace(); nextGraceAt = now + (90 + Math.random() * 60) * 1000; return; }
+    if (!grace.active && now >= nextGraceAt) startGrace(60);
+  } catch (e) {}
+}, 5000);
 setInterval(() => { try { io.emit('mass', massSnapshot()); } catch (e) {} }, 10000);
-// --- Phung vu doi dap: cha xuong cau, cong doan dap lai (VI + EN) ---
+// --- Do Kinh Thanh: quiz cong dong vai phut 1 lan, nhanh tay + nhieu ✦ ---
+const QUIZ_QS = [
+  { q: "Ai là vị Giáo hoàng đầu tiên?", opts: ["Phêrô", "Phaolô", "Gioan", "Mátthêu"], a: 0, q_en: "Who was the first Pope?", opts_en: ["Peter", "Paul", "John", "Matthew"], a_en: 0 },
+  { q: "Chúa Giêsu sinh ra tại đâu?", opts: ["Bêlem", "Nazareth", "Giêrusalem", "Capharnaum"], a: 0, q_en: "Where was Jesus born?", opts_en: ["Bethlehem", "Nazareth", "Jerusalem", "Capernaum"], a_en: 0 },
+  { q: "Bí tích đầu tiên người Công giáo lãnh nhận?", opts: ["Rửa Tội", "Thêm Sức", "Thánh Thể", "Hòa Giải"], a: 0, q_en: "First sacrament a Catholic receives?", opts_en: ["Baptism", "Confirmation", "Eucharist", "Reconciliation"], a_en: 0 },
+  { q: "Mẹ của Chúa Giêsu tên là gì?", opts: ["Maria", "Anna", "Elisabeth", "Mácta"], a: 0, q_en: "What is the name of Jesus' mother?", opts_en: ["Mary", "Anna", "Elizabeth", "Martha"], a_en: 0 },
+  { q: "Thánh lễ có mấy phần chính?", opts: ["2", "3", "4", "5"], a: 0, q_en: "How many main parts does the Mass have?", opts_en: ["2", "3", "4", "5"], a_en: 0 },
+  { q: "Vị thánh được gọi là 'Tông đồ dân ngoại'?", opts: ["Phaolô", "Phêrô", "Gioan", "Giacôbê"], a: 0, q_en: "Which saint is called 'Apostle to the Gentiles'?", opts_en: ["Paul", "Peter", "John", "James"], a_en: 0 },
+  { q: "Sông nào Chúa Giêsu chịu phép rửa?", opts: ["Giođan", "Nin", "Tigrơ", "Ơphrat"], a: 0, q_en: "In which river was Jesus baptized?", opts_en: ["Jordan", "Nile", "Tigris", "Euphrates"], a_en: 0 },
+  { q: "Nhà thờ Đức Bà Paris khởi công năm nào?", opts: ["1163", "1345", "1804", "2019"], a: 0, q_en: "When did Notre-Dame de Paris construction begin?", opts_en: ["1163", "1345", "1804", "2019"], a_en: 0 },
+  { q: "Vatican nằm trong thành phố nào?", opts: ["Roma", "Paris", "Madrid", "Lisbon"], a: 0, q_en: "Vatican is located in which city?", opts_en: ["Rome", "Paris", "Madrid", "Lisbon"], a_en: 0 },
+  { q: "Mầu nhiệm Mân Côi có mấy mùa?", opts: ["4", "3", "5", "7"], a: 0, q_en: "How many sets of Rosary mysteries?", opts_en: ["4", "3", "5", "7"], a_en: 0 },
+  { q: "Ai phản bội Chúa với 30 đồng bạc?", opts: ["Giuđa", "Phêrô", "Tôma", "Gioan"], a: 0, q_en: "Who betrayed Jesus for 30 pieces of silver?", opts_en: ["Judas", "Peter", "Thomas", "John"], a_en: 0 },
+  { q: "Lễ Giáng Sinh mừng ngày nào?", opts: ["25/12", "1/1", "15/8", "29/6"], a: 0, q_en: "Christmas is celebrated on?", opts_en: ["Dec 25", "Jan 1", "Aug 15", "Jun 29"], a_en: 0 },
+];
+let quiz = { active: false, qid: 0, idx: 0, endsAt: 0, answered: new Set(), winner: null };
+function graceMult() { try { return grace.active ? 2 : 1; } catch (e) { return 1; } }
+// Cong diem tap trung: tu dong x2 khi Mua on lanh + cap nhat BXH
+function grantFaith(socket, p, base, why) {
+  const mult = graceMult();
+  const gain = Math.max(1, Math.round(base * mult));
+  const cur = uidFaith.get(p.uid);
+  const nf = (cur ? cur.faith : 0) + gain;
+  uidFaith.set(p.uid, { name: p.name, faith: nf, gx: p.gx, updated: Date.now() });
+  p.faith = nf;
+  let tot = 0, mem = new Set();
+  for (const u of uidFaith.values()) if (u.gx === p.gx) { tot += u.faith; mem.add(u.name); }
+  parishStats.set(p.gx, { code: p.gx, name: parishName(p.gx), total: tot, members: mem });
+  io.emit('boards', boardSnapshot());
+  try { io.emit('player-faith', { id: socket.id, faith: nf }); } catch (e) {}
+  return { nf, gain };
+}
+function startQuiz() {
+  const idx = Math.floor(Math.random() * QUIZ_QS.length);
+  const qid = Date.now();
+  quiz = { active: true, qid, idx, endsAt: qid + 25000, answered: new Set(), winner: null };
+  const base = QUIZ_QS[idx];
+  // tron dap an de khong doan vi tri
+  const order = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
+  quiz.order = order;
+  quiz.correct = order.indexOf(0);
+  try {
+    io.emit('quiz', {
+      qid, left: 25,
+      q: base.q, opts: order.map(i => base.opts[i]),
+      q_en: base.q_en, opts_en: order.map(i => base.opts_en[i]),
+    });
+  } catch (e) {}
+}
+function stopQuiz() {
+  const base = QUIZ_QS[quiz.idx];
+  try { io.emit('quiz-end', { qid: quiz.qid, correct: quiz.correct, winner: quiz.winner }); } catch (e) {}
+  quiz = { active: false, qid: 0, idx: 0, endsAt: 0, answered: new Set(), winner: null };
+}
+let nextQuizAt = Date.now() + 35 * 1000; // tran dau sau ~35s de nguoi moi gap ngay
+setInterval(() => {
+  try {
+    const now = Date.now();
+    if (quiz.active && now >= quiz.endsAt) { stopQuiz(); nextQuizAt = now + (75 + Math.random() * 45) * 1000; return; }
+    if (!quiz.active && now >= nextQuizAt) startQuiz();
+  } catch (e) {}
+}, 3000);
+// --- Le mini tu dong: cu ~12 phut co 1 le 3 phut de luc nao vao cung co viec chung ---
+let lastAutoMini = 0;
+setInterval(() => {
+  try {
+    const now = Date.now();
+    if (!mass.active && now - lastMiniMass > 12 * 60 * 1000 && now - lastAutoMini > 12 * 60 * 1000) {
+      lastAutoMini = now; lastMiniMass = now;
+      startMass('mini', 3);
+    }
+  } catch (e) {}
+}, 15000);
 const LITURGY = [
   { p: "Chúa ở cùng anh chị em.", a: "Và ở cùng cha.", w: ["Amen.", "Tạ ơn Chúa.", "Vinh danh Chúa."] },
   { p: "Xin Thiên Chúa toàn năng thương xót, tha tội cho chúng ta.", a: "Amen.", w: ["Và ở cùng cha.", "Tạ ơn Chúa.", "Alleluia."] },
@@ -123,7 +219,7 @@ const LITURGY_EN = [
   { p: "Pray that my sacrifice and yours may be acceptable to God.", a: "May the Lord accept the sacrifice at your hands.", w: ["Amen.", "Thanks be to God.", "Alleluia."] },
   { p: "The Mass is ended, go in peace.", a: "Thanks be to God.", w: ["Amen.", "Glory to God.", "Yes, Lord."] },
 ];
-const LIT_STEP_MS = 25000;
+const LIT_STEP_MS = 18000;
 function seededShuffle(arr, seed) {
   const a = arr.slice();
   let s = (Number(seed) || 1) >>> 0 || 1;
@@ -271,6 +367,12 @@ io.on('connection', (socket) => {
       socket.emit('mass', massSnapshot());
       const lit = currentLit();
       if (lit) socket.emit('lit', { step: lit.step, priest: lit.priest, options: lit.options, priest_en: lit.priest_en, options_en: lit.options_en, left: lit.left });
+      socket.emit('grace', graceSnapshot());
+      if (quiz.active) {
+        const base = QUIZ_QS[quiz.idx];
+        const left = Math.max(0, Math.ceil((quiz.endsAt - Date.now()) / 1000));
+        socket.emit('quiz', { qid: quiz.qid, left, q: base.q, opts: quiz.order.map(i => base.opts[i]), q_en: base.q_en, opts_en: quiz.order.map(i => base.opts_en[i]) });
+      }
     } catch (e) {}
   });
   socket.on('start-mini-mass', () => {
@@ -290,22 +392,15 @@ io.on('connection', (socket) => {
       const key = socket.id + ':mass:' + mass.startedAt;
       if (lastChat.get(key)) return;
       lastChat.set(key, 1);
-      const cur = uidFaith.get(p.uid);
-      const nf = (cur ? cur.faith : 0) + (mass.kind === 'big' ? 30 : 15);
-      uidFaith.set(p.uid, { name: p.name, faith: nf, gx: p.gx, updated: Date.now() });
-      p.faith = nf;
-      let tot = 0, mem = new Set();
-      for (const u of uidFaith.values()) if (u.gx === p.gx) { tot += u.faith; mem.add(u.name); }
-      parishStats.set(p.gx, { code: p.gx, name: parishName(p.gx), total: tot, members: mem });
-      socket.emit('mass-reward', { faith: nf, bonus: mass.kind === 'big' ? 30 : 15 });
-      io.emit('boards', boardSnapshot());
-      try { io.emit('player-faith', { id: socket.id, faith: nf }); } catch (e) {}
+      const base = mass.kind === 'big' ? 30 : 15;
+      const { nf, gain } = grantFaith(socket, p, base, 'mass');
+      socket.emit('mass-reward', { faith: nf, bonus: gain });
     } catch (e) {}
   });
   socket.on('get-candles', () => {
     try { socket.emit('candles', candles.slice(-60).reverse()); } catch (e) {}
   });
-  // --- Dap loi phung vu: dung +6✦ / sai +1✦, chi 1 lan moi cau ---
+  // --- Dap loi phung vu: dung +6✦ / sai +1✦ (x2 khi Mua on lanh), chi 1 lan moi cau ---
   socket.on('lit-answer', ({ step, text }) => {
     try {
       const p = players.get(socket.id);
@@ -320,18 +415,32 @@ io.on('connection', (socket) => {
       const baseEn = LITURGY_EN[lit.idx % LITURGY_EN.length];
       const txt = String(text || '').trim();
       const ok = txt === base.a || txt === baseEn.a;
-      const gain = ok ? 6 : 1;
-      const cur = uidFaith.get(p.uid);
-      const nf = (cur ? cur.faith : 0) + gain;
-      uidFaith.set(p.uid, { name: p.name, faith: nf, gx: p.gx, updated: Date.now() });
-      p.faith = nf;
-      let tot = 0, mem = new Set();
-      for (const u of uidFaith.values()) if (u.gx === p.gx) { tot += u.faith; mem.add(u.name); }
-      parishStats.set(p.gx, { code: p.gx, name: parishName(p.gx), total: tot, members: mem });
+      const { nf, gain } = grantFaith(socket, p, ok ? 6 : 1, 'lit');
       socket.emit('lit-result', { step: lit.step, ok, gain, faith: nf });
-      io.emit('boards', boardSnapshot());
-      try { io.emit('player-faith', { id: socket.id, faith: nf }); } catch (e2) {}
       try { io.to(p.zone).emit('player-action', { id: socket.id, action: 'amen', text: String(text || '').slice(0, 60) }); } catch (e2) {}
+    } catch (e) {}
+  });
+  // --- Do Kinh Thanh: tra loi nhanh + nhieu ✦, moi nguoi 1 lan/cau ---
+  socket.on('quiz-answer', ({ qid, idx }) => {
+    try {
+      const p = players.get(socket.id);
+      if (!p || !quiz.active) return;
+      if (Number(qid) !== quiz.qid) return;
+      const key = socket.id + ':quiz:' + quiz.qid;
+      if (quiz.answered.has(key)) return;
+      quiz.answered.add(key);
+      const ok = Number(idx) === quiz.correct;
+      let base = 0;
+      if (ok) {
+        if (!quiz.winner) { quiz.winner = p.name; base = 20; }
+        else base = 10;
+      } else base = 1;
+      const { nf, gain } = grantFaith(socket, p, base, 'quiz');
+      socket.emit('quiz-result', { qid: quiz.qid, ok, gain, faith: nf, first: quiz.winner === p.name && ok });
+      if (ok && quiz.winner === p.name) {
+        try { io.emit('quiz-first', { qid: quiz.qid, name: p.name }); } catch (e2) {}
+        try { io.to(p.zone).emit('player-action', { id: socket.id, action: 'amen', text: 'Đáp đúng Kinh Thánh!' }); } catch (e2) {}
+      }
     } catch (e) {}
   });
   socket.on('light-candle', ({ text }) => {
@@ -346,17 +455,9 @@ io.on('connection', (socket) => {
     if (candles.length > 60) candles = candles.slice(-60);
     saveData();
     io.emit('candles', candles.slice(-60).reverse());
-    // Thuong nguoi thap: cong truc tiep vao faith server de BXH len ngay
+    // Thuong nguoi thap: cong truc tiep vao faith server de BXH len ngay (x2 khi Mua on lanh)
     try {
-      const cur = uidFaith.get(p.uid);
-      const nf = (cur ? cur.faith : 0) + 5;
-      uidFaith.set(p.uid, { name: p.name, faith: nf, gx: p.gx, updated: now });
-      p.faith = nf;
-      let tot = 0, mem = new Set();
-      for (const u of uidFaith.values()) if (u.gx === p.gx) { tot += u.faith; mem.add(u.name); }
-      parishStats.set(p.gx, { code: p.gx, name: parishName(p.gx), total: tot, members: mem });
-      io.emit('boards', boardSnapshot());
-      try { io.emit('player-faith', { id: socket.id, faith: nf }); } catch (e) {}
+      grantFaith(socket, p, 5, 'candle');
     } catch (e) {}
   });
   socket.on('disconnect', () => {

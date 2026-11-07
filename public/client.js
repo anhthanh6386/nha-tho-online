@@ -285,9 +285,9 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.12;
+renderer.toneMappingExposure = 1.35;
 addEventListener("resize", () => { camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
-scene.add(new THREE.HemisphereLight(0xbfd9ff, 0x3a4a3a, 0.9));
+scene.add(new THREE.HemisphereLight(0xcfe0ff, 0x4a5a4a, 1.35));
 const sun = new THREE.DirectionalLight(0xfff1d6, 2.0);
 sun.position.set(8, 14, 8); sun.castShadow = true;
 sun.shadow.mapSize.set(2048, 2048);
@@ -304,7 +304,7 @@ streetSun.shadow.camera.left = -130; streetSun.shadow.camera.right = 130;
 streetSun.shadow.camera.top = 130; streetSun.shadow.camera.bottom = -130;
 streetSun.shadow.camera.far = 300;
 streetSun.target.position.set(100, 0, 10); scene.add(streetSun.target); scene.add(streetSun);
-scene.add(new THREE.AmbientLight(0x8899bb, 0.15));
+scene.add(new THREE.AmbientLight(0x8899bb, 0.55));
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 50), new THREE.MeshStandardMaterial({ color: 0x4a3f35 }));
 floor.rotation.x = -Math.PI/2; floor.receiveShadow = true; scene.add(floor);
 const carpet = new THREE.Mesh(new THREE.PlaneGeometry(4, 34), new THREE.MeshStandardMaterial({ color: 0x7a1f2b }));
@@ -348,9 +348,9 @@ function applyInteriorTheme(zone) {
   try {
     const nl = scene.userData.naveLights;
     if (nl) {
-      if (zone === 'church-2') { nl[0].intensity = 2.6; nl[1].intensity = 2.4; nl[0].position.set(0, 8, 2); nl[1].position.set(0, 8.5, -13); }
-      else if (zone === 'church-1') { nl[0].intensity = 3.0; nl[1].intensity = 2.8; nl[0].position.set(0, 8, 6); nl[1].intensity = 2.8; nl[1].position.set(0, 8.5, -14); }
-      else { nl[0].intensity = 1.5; nl[1].intensity = 1.3; nl[0].position.set(0, 7, 4); nl[1].position.set(0, 7, -10); }
+      if (zone === 'church-2') { nl[0].intensity = 5.2; nl[1].intensity = 4.8; nl[0].position.set(0, 8, 2); nl[1].position.set(0, 8.5, -13); }
+      else if (zone === 'church-1') { nl[0].intensity = 5.8; nl[1].intensity = 5.2; nl[0].position.set(0, 8, 6); nl[1].intensity = 5.2; nl[1].position.set(0, 8.5, -14); }
+      else { nl[0].intensity = 3.4; nl[1].intensity = 3.0; nl[0].position.set(0, 7, 4); nl[1].position.set(0, 7, -10); }
     }
   } catch (e) {}
 }
@@ -844,10 +844,10 @@ for (let i = 0; i < 5; i++) {
 }
 const roof = new THREE.Mesh(new THREE.ConeGeometry(24, 8, 4), new THREE.MeshStandardMaterial({ color: 0x6b4a2f, side: THREE.DoubleSide }));
 roof.position.set(0, 13, 5); roof.rotation.y = Math.PI / 4; roof.castShadow = false; roof.receiveShadow = false; scene.add(roof);
-// Den tran long nha tho (khong thi trong nha toi om)
-const naveLight1 = new THREE.PointLight(0xffe2b0, 1.5, 42, 1.2);
+// Den tran long nha tho (khong thi trong nha toi om) — tang sang gap doi de khong toi om
+const naveLight1 = new THREE.PointLight(0xffe2b0, 2.8, 46, 1.0);
 naveLight1.position.set(0, 7, 4); scene.add(naveLight1);
-const naveLight2 = new THREE.PointLight(0xffd9a0, 1.3, 40, 1.2);
+const naveLight2 = new THREE.PointLight(0xffd9a0, 2.5, 44, 1.0);
 naveLight2.position.set(0, 7, -10); scene.add(naveLight2);
 scene.userData.naveLights = [naveLight1, naveLight2];
 // ---- Vista sau cua chinh: nhin tu trong ra van thay pho (luon hien, khong phu thuoc streetGroup) ----
@@ -1786,17 +1786,36 @@ function makeAvatar(p) {
   const g = new THREE.Group();
   g.userData.pid = p.id;
   const col = AO_COLORS[p.ao] || 0x3b82f6;
-  const skin = 0xf2c9a0;
-  const bodyMat = new THREE.MeshStandardMaterial({ color: col, roughness: 0.75, metalness: 0.05 });
-  const skinMat = new THREE.MeshStandardMaterial({ color: skin, roughness: 0.55 });
-  const darkMat = new THREE.MeshStandardMaterial({ color: 0x2b3550, roughness: 0.85 });
+  const skin = 0xf5c9a0;
+  const bodyMat = new THREE.MeshStandardMaterial({ color: col, roughness: 0.6, metalness: 0.08 });
+  const skinMat = new THREE.MeshStandardMaterial({ color: skin, roughness: 0.45, metalness: 0.0 });
+  const darkMat = new THREE.MeshStandardMaterial({ color: 0x2b3550, roughness: 0.8 });
+  const goldMat = new THREE.MeshStandardMaterial({ color: 0xd9a441, roughness: 0.35, metalness: 0.7 });
   // Than: capsule tron + hong + co ao (nhin nhu nguoi that mac ao)
-  const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.44, 0.75, 6, 14), bodyMat);
+  const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.42, 0.72, 6, 16), bodyMat);
   body.castShadow = true;
   body.position.y = 1.2; g.add(body);
-  const hips = new THREE.Mesh(new THREE.SphereGeometry(0.4, 12, 10), darkMat);
-  hips.scale.set(1.05, 0.7, 0.85); hips.position.y = 0.62; hips.castShadow = true; g.add(hips);
+  // Vai tron cho do noi tay - than lien mach
+  for (const sx of [-1, 1]) {
+    const pad = new THREE.Mesh(new THREE.SphereGeometry(0.17, 12, 10), bodyMat);
+    pad.position.set(sx * 0.5, 0.42, 0); pad.castShadow = true; body.add(pad);
+  }
+  // Hang cuc ao + day thich chu + Thanh Gia truoc nguc
+  for (let i = 0; i < 3; i++) {
+    const btn = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), goldMat);
+    btn.position.set(0, 0.15 - i * 0.16, 0.41); body.add(btn);
+  }
+  const crossV = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.22, 0.04), goldMat);
+  crossV.position.set(0, 0.28, 0.43); body.add(crossV);
+  const crossH = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.06, 0.04), goldMat);
+  crossH.position.set(0, 0.32, 0.43); body.add(crossH);
+  const hips = new THREE.Mesh(new THREE.SphereGeometry(0.39, 14, 10), darkMat);
+  hips.scale.set(1.02, 0.72, 0.85); hips.position.y = 0.62; hips.castShadow = true; g.add(hips);
+  // That lung + dai lung
+  const belt = new THREE.Mesh(new THREE.TorusGeometry(0.4, 0.05, 8, 20), goldMat);
+  belt.position.y = 0.86; belt.rotation.x = Math.PI / 2; belt.scale.set(1, 0.85, 1); g.add(belt);
   g.userData.hips = hips;
+  g.userData.belt = belt;
   const collar = new THREE.Mesh(new THREE.TorusGeometry(0.24, 0.07, 8, 16), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6 }));
   collar.position.y = 1.78; collar.rotation.x = Math.PI / 2; g.add(collar);
   const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.16, 0.22, 10), skinMat);
@@ -1819,20 +1838,37 @@ function makeAvatar(p) {
   }
   const armL = limb(0.15, 0.22, bodyMat); armL.position.set(-0.58, 1.66, 0); g.add(armL);
   const armR = limb(0.15, 0.22, bodyMat); armR.position.set(0.58, 1.66, 0); g.add(armR);
-  // Cang tay + khuyu (de chap tay / dua tay that, khong phai tay thang duc)
+  // Tay co khuy + ban tay co ngon (nhin gan khong con la cuc tron)
   function forearm(r, len, mat) {
     const pivot = new THREE.Group();
     const m = new THREE.Mesh(new THREE.CapsuleGeometry(r, len, 4, 10), mat);
     m.castShadow = true;
     m.position.y = -(len / 2 + r * 0.5); pivot.add(m);
+    // Mang set tay ao trang o co tay
+    const cuff = new THREE.Mesh(new THREE.CylinderGeometry(r + 0.035, r + 0.045, 0.09, 12), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6 }));
+    cuff.position.y = -len - r * 0.4; pivot.add(cuff);
     return pivot;
   }
-  const elbL = forearm(0.13, 0.22, bodyMat); elbL.position.y = -0.32; armL.add(elbL);
-  const elbR = forearm(0.13, 0.22, bodyMat); elbR.position.y = -0.32; armR.add(elbR);
-  const handL = new THREE.Mesh(new THREE.SphereGeometry(0.15, 12, 10), skinMat);
-  handL.castShadow = true;
-  handL.position.y = -0.36; elbL.add(handL);
-  const handR = handL.clone(); elbR.add(handR);
+  const elbL = forearm(0.13, 0.22, bodyMat); elbL.position.y = -0.34; armL.add(elbL);
+  const elbR = forearm(0.13, 0.22, bodyMat); elbR.position.y = -0.34; armR.add(elbR);
+  function makeHand() {
+    const h = new THREE.Group();
+    const palm = new THREE.Mesh(new THREE.SphereGeometry(0.13, 12, 10), skinMat);
+    palm.scale.set(1, 1.25, 0.7); palm.castShadow = true; h.add(palm);
+    // 4 ngon + ngon cai (tron, nhin xa van ro la ban tay)
+    for (let i = -1.5; i <= 1.5; i++) {
+      const f = new THREE.Mesh(new THREE.CapsuleGeometry(0.028, 0.07, 3, 8), skinMat);
+      f.position.set(i * 0.06, -0.19, 0.01); h.add(f);
+    }
+    const thumb = new THREE.Mesh(new THREE.CapsuleGeometry(0.03, 0.06, 3, 8), skinMat);
+    thumb.position.set(0.13, -0.05, 0.04); thumb.rotation.z = -0.7; h.add(thumb);
+    h.position.y = -0.4;
+    return h;
+  }
+  const handL = makeHand(); elbL.add(handL);
+  const handR = makeHand(); handR.children.forEach(c => { }); elbR.add(handR);
+  // Ban tay phai lat nguoc ngon cai
+  try { handR.children[handR.children.length - 1].position.x = -0.13; handR.children[handR.children.length - 1].rotation.z = 0.7; } catch (e) {}
   g.userData.elbL = elbL; g.userData.elbR = elbR;
   const legMat = new THREE.MeshStandardMaterial({ color: 0x2b3550, roughness: 0.85 });
   // Dui (hip pivot) + khop goi that + ong chan — tong dai dui+ong = 0.64 de chan cham dat vua
@@ -1846,33 +1882,65 @@ function makeAvatar(p) {
     shin.position.y = -0.16; kn2.add(shin);
   }
   g.userData.kneeL = kneeL; g.userData.kneeR = kneeR;
-  // Giay gan vao ONG CHAN (duoi khop goi) de gap goi thi ban chan di theo that
+  // Banh che dau goi: che khop khi gap goi sau, khong con cam giac chan roi
+  for (const lg of [legL, legR]) {
+    const cap = new THREE.Mesh(new THREE.SphereGeometry(0.155, 10, 8), legMat);
+    cap.position.y = -0.32; cap.castShadow = true; lg.add(cap);
+  }
+  // Giay da that: de + mui tron + got — diem xoay dat o co chan de gap goi tu nhien
   const shoes = [];
+  const shoeMat = new THREE.MeshStandardMaterial({ color: 0x4a3428, roughness: 0.55 });
+  const soleMat = new THREE.MeshStandardMaterial({ color: 0xe6dfcf, roughness: 0.85 });
   for (const kn2 of [kneeL, kneeR]) {
-    const shoe = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.16, 0.5), new THREE.MeshStandardMaterial({ color: 0x4a3428, roughness: 0.6 }));
-    shoe.position.set(0, -0.34, 0.08); shoe.castShadow = true; kn2.add(shoe);
-    shoes.push(shoe);
+    const shoeG = new THREE.Group();
+    shoeG.position.set(0, -0.32, 0); // co chan (cuoi ong chan)
+    const upper = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.14, 0.42), shoeMat);
+    upper.position.set(0, 0.02, 0.06); upper.castShadow = true; shoeG.add(upper);
+    const toe = new THREE.Mesh(new THREE.SphereGeometry(0.14, 10, 8), shoeMat);
+    toe.position.set(0, 0.01, 0.27); toe.scale.set(1, 0.55, 1); shoeG.add(toe);
+    const sole = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.05, 0.52), soleMat);
+    sole.position.set(0, -0.065, 0.08); shoeG.add(sole);
+    kn2.add(shoeG);
+    shoes.push(shoeG);
   }
   g.userData.shoes = shoes;
   // Mat + toc (nhin chinh dien +z) — cho het vao headG de cui dau thi ca mat cui theo
-  const hairMat = new THREE.MeshStandardMaterial({ color: 0x3a2a1c, roughness: 0.9 });
-  const hair = new THREE.Mesh(new THREE.SphereGeometry(0.45, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.55), hairMat);
-  hair.position.y = 0.41; hair.rotation.x = -0.25; hair.castShadow = true; headG.add(hair);
-  g.userData.hair = hair;
-  const eyeMat = new THREE.MeshBasicMaterial({ color: 0x1f2937 });
-  g.userData.eyes = [];
-  for (const sx of [-0.16, 0.16]) {
-    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.055, 8, 8), eyeMat);
-    eye.position.set(sx, 0.37, 0.37); headG.add(eye);
-    g.userData.eyes.push(eye);
-    const brow = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.04, 0.03), hairMat);
-    brow.position.set(sx, 0.51, 0.38); brow.rotation.z = sx > 0 ? -0.12 : 0.12; headG.add(brow);
+  // Toc: dinh + gau sau gay + mai 2 ben (khong con hoi dau)
+  const hairMat = new THREE.MeshStandardMaterial({ color: 0x3a2a1c, roughness: 0.85 });
+  const hair = new THREE.Mesh(new THREE.SphereGeometry(0.46, 18, 12, 0, Math.PI * 2, 0, Math.PI * 0.55), hairMat);
+  hair.position.y = 0.44; hair.rotation.x = -0.3; hair.castShadow = true; headG.add(hair);
+  const hairBack = new THREE.Mesh(new THREE.SphereGeometry(0.4, 14, 10), hairMat);
+  hairBack.position.set(0, 0.22, -0.18); hairBack.scale.set(1.02, 1.05, 0.9); headG.add(hairBack);
+  for (const sx of [-1, 1]) {
+    const side = new THREE.Mesh(new THREE.SphereGeometry(0.12, 10, 8), hairMat);
+    side.position.set(sx * 0.38, 0.22, 0.1); headG.add(side);
   }
-  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.1, 8), skinMat);
-  nose.position.set(0, 0.27, 0.42); nose.rotation.x = Math.PI / 2; headG.add(nose);
-  const mouth = new THREE.Mesh(new THREE.TorusGeometry(0.08, 0.018, 6, 12, Math.PI), new THREE.MeshStandardMaterial({ color: 0xa2543a, roughness: 0.7 }));
-  mouth.position.set(0, 0.17, 0.38); mouth.rotation.x = 0.25; mouth.rotation.z = Math.PI; headG.add(mouth);
+  g.userData.hair = hair;
+  // Mat toon 2 lop: long trang + con nguoi den — nhin xa van thay ro, co hon mat
+  g.userData.eyes = []; g.userData.pupils = [];
+  for (const sx of [-0.17, 0.17]) {
+    const sclera = new THREE.Mesh(new THREE.SphereGeometry(0.095, 12, 10), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 }));
+    sclera.position.set(sx, 0.38, 0.35); headG.add(sclera);
+    g.userData.eyes.push(sclera);
+    const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.045, 10, 8), new THREE.MeshBasicMaterial({ color: 0x1f2937 }));
+    pupil.position.set(sx, 0.38, 0.425); headG.add(pupil);
+    g.userData.pupils.push(pupil);
+    const glint = new THREE.Mesh(new THREE.SphereGeometry(0.016, 6, 6), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+    glint.position.set(sx + 0.018, 0.4, 0.462); headG.add(glint);
+    g.userData.pupils.push(glint);
+    const brow = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.05, 0.04), hairMat);
+    brow.position.set(sx, 0.55, 0.36); brow.rotation.z = sx > 0 ? -0.12 : 0.12; headG.add(brow);
+  }
+  const nose = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), skinMat);
+  nose.position.set(0, 0.28, 0.42); nose.scale.set(0.8, 1, 0.8); headG.add(nose);
+  // Mieng cuoi hien + ma hong hao
+  const mouth = new THREE.Mesh(new THREE.TorusGeometry(0.09, 0.028, 8, 14, Math.PI * 0.9), new THREE.MeshStandardMaterial({ color: 0xb4543e, roughness: 0.6 }));
+  mouth.position.set(0, 0.16, 0.385); mouth.rotation.x = 0.15; mouth.rotation.z = Math.PI * 1.05; headG.add(mouth);
   g.userData.mouth = mouth;
+  for (const sx of [-1, 1]) {
+    const cheek = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), new THREE.MeshStandardMaterial({ color: 0xf0a080, roughness: 0.9, transparent: true, opacity: 0.55 }));
+    cheek.position.set(sx * 0.26, 0.24, 0.33); cheek.scale.set(1, 0.7, 0.4); headG.add(cheek);
+  }
   // Bong tron gia duoi chan (luon thay duoc ca khi shadow map yeu / mobile)
   const blob = new THREE.Mesh(new THREE.CircleGeometry(0.62, 20), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.28, depthWrite: false }));
   blob.rotation.x = -Math.PI / 2; blob.position.y = 0.02; g.add(blob);
@@ -1974,6 +2042,47 @@ function refreshRank(id) {
   } catch (e) {}
 }
 function addPlayer(p) { if (p.y === undefined) p.y = 0; p.__px = p.x; p.__pz = p.z; p.__lastAnim = performance.now(); players.set(p.id, p); meshes.set(p.id, makeAvatar(p)); updateOnline(); }
+// ---- Bui buoc chan: puff nhe khi got cham dat (nhin ro nhịp buoc) ----
+const __puffs = [];
+function puffAtFoot(m, side) {
+  try {
+    let pf = __puffs.find(o => !o.visible);
+    if (!pf) {
+      if (__puffs.length >= 14) pf = __puffs[0];
+      else {
+        const cv = document.createElement("canvas"); cv.width = cv.height = 64;
+        const c2 = cv.getContext("2d");
+        const gr = c2.createRadialGradient(32, 32, 2, 32, 32, 30);
+        gr.addColorStop(0, "rgba(220,210,195,0.85)"); gr.addColorStop(1, "rgba(220,210,195,0)");
+        c2.fillStyle = gr; c2.fillRect(0, 0, 64, 64);
+        const tex = new THREE.CanvasTexture(cv);
+        pf = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0, depthWrite: false }));
+        pf.scale.set(0.7, 0.45, 1); scene.add(pf); __puffs.push(pf);
+      }
+    }
+    const sh = (m.userData && m.userData.shoes) ? m.userData.shoes[side ? 1 : 0] : null;
+    const wp = new THREE.Vector3(); m.getWorldPosition(wp);
+    if (sh) { try { const sp = new THREE.Vector3(); sh.getWorldPosition(sp); wp.x = sp.x; wp.z = sp.z; } catch (e) {} }
+    pf.position.set(wp.x, 0.12, wp.z);
+    pf.material.opacity = 0.55; pf.scale.set(0.55, 0.35, 1);
+    pf.userData.life = 0.45;
+  } catch (e) {}
+}
+function tickPuffs(dt) {
+  try {
+    for (const pf of __puffs) {
+      if (!pf.visible && !(pf.material.opacity > 0.02)) continue;
+      pf.visible = true;
+      pf.userData.life = (pf.userData.life ?? 0.45) - dt;
+      const k = Math.max(0, pf.userData.life / 0.45);
+      pf.material.opacity = 0.55 * k;
+      const s = 0.55 + (1 - k) * 0.7;
+      pf.scale.set(s, s * 0.6, 1);
+      pf.position.y += dt * 0.5;
+      if (pf.userData.life <= 0) { pf.visible = false; pf.material.opacity = 0; }
+    }
+  } catch (e) {}
+}
 // ---- He thong animation avatar (di / chay / nhay / cau-nguyen / chao / hat) ----
 function tickAvatar(id, p, m, dt, now) {
   const u = m.userData;
@@ -1984,94 +2093,186 @@ function tickAvatar(id, p, m, dt, now) {
   const dist = Math.hypot(p.x - px, p.z - pz);
   const speed = dt > 0 ? dist / dt : 0;
   p.__px = p.x; p.__pz = p.z;
-  const moving = speed > 0.4;
-  const sprinting = speed > 9.5;
-  u.phase = (u.phase || 0) + dt * (sprinting ? 13 : moving ? 9 : 2);
+  const moving = speed > 0.5;
+  const sprinting = speed > 8.5;
+  // Khoa nhip buoc theo van toc that (stride lock): 1 vong phase = 2 buoc chan
+  // Toc do game nhanh hon nguoi that (di bo game ~5m/s) nen khoa buoc chan theo kieu jog nhe cho do truot chan
+  const stepLen = sprinting ? 1.25 : 0.85;
+  const cycHz = moving ? Math.min(sprinting ? 2.4 : 1.7, Math.max(0.85, speed / (2 * stepLen))) : 0;
+  const phaseRate = moving ? Math.PI * 2 * cycHz : 1.6;
+  // Noi mem khi bat dau buoc / dung lai de khong giat
+  u.__gait = (u.__gait ?? 0) + ((moving ? 1 : 0) - (u.__gait ?? 0)) * Math.min(1, dt * (moving ? 6 : 8));
+  const gait = u.__gait || 0;
+  u.phase = (u.phase || 0) + dt * (moving ? phaseRate : 1.6);
   const sw = Math.sin(u.phase), sw2 = Math.sin(u.phase + Math.PI);
-  // reset co ban
-  let aLx = 0, aRx = 0, aLz = 0.12, aRz = -0.12, lLx = 0, lRx = 0, headRx = 0, crouch = 0, kneel = 0, eyeShut = 0, prayBreath = 0;
-  let eLx = -0.15, eRx = -0.15, eLz = 0, eRz = 0, eLy = 0, eRy = 0, kLx = 0.08, kRx = 0.08;
+  if (p.action === "amen" && u.__lastAct !== "amen") u.__amenT = now;
+  u.__lastAct = p.action || "idle";
+  const swB = Math.sin(u.phase * 0.5); // nhip phu cho hong/vai
+  // Chuan bi target pose
+  let aLx = 0, aRx = 0, aLz = 0.14, aRz = -0.14, lLx = 0, lRx = 0, headRx = 0, headRy = 0, crouch = 0, kneel = 0, prayBreath = 0;
+  let eLx = -0.18, eRx = -0.18, eLz = 0, eRz = 0, eLy = 0, eRy = 0, kLx = 0.1, kRx = 0.1;
+  let bodyRy = 0, hipRy = 0, mouthOpen = 0, leanAdd = 0;
   if (air) {
-    aLx = -2.4; aRx = -2.4; aLz = 0.5; aRz = -0.5;
-    lLx = 0.55; lRx = -0.35; headRx = -0.15;
-    eLx = -0.4; eRx = -0.4; kLx = 0.9; kRx = 0.4;
+    aLx = -2.2; aRx = -2.0; aLz = 0.55; aRz = -0.55;
+    lLx = 0.5; lRx = -0.3; headRx = -0.18; headRy = 0;
+    eLx = -0.5; eRx = -0.45; kLx = 1.0; kRx = 0.45; leanAdd = -0.08;
   } else if (p.action === "cau-nguyen") {
-    // Ngoai doi that: QUY GOI — dui tu hong chuoi xuong truoc, goi cham dat,
-    // ong chan gap nguoc ra sau nam doc mat dat, MU ban chan ap dat (sole nguoc len),
-    // hai tay CHAP lai truoc nguc (khuu tay gap), dau CUI xuong, mat lim dim.
-    const br = Math.sin(t * 1.8) * 0.05; // nhịp tho khi cau nguyen
-    aLx = -0.55 + br; aRx = -0.55 + br; aLz = 0.22; aRz = -0.22;
-    lLx = -0.35; lRx = -0.35; headRx = 0.55; crouch = 0.25; kneel = 1; eyeShut = 1; prayBreath = br;
-    eLx = -1.15 + br; eRx = -1.15 + br; eLz = 0; eRz = 0; eLy = -0.65; eRy = 0.65;
-    kLx = 1.92; kRx = 1.92;
+    // QUY GOI that: dui chuoi xuong, goi cham dat, tay chap truoc nguc, dau cui, tho nhe
+    const br = Math.sin(t * 1.8) * 0.05;
+    aLx = -0.62 + br; aRx = -0.62 + br; aLz = 0.24; aRz = -0.24;
+    lLx = -0.38; lRx = -0.38; headRx = 0.52; headRy = Math.sin(t * 0.7) * 0.04;
+    crouch = 0.24; kneel = 1; prayBreath = br;
+    eLx = -1.2 + br; eRx = -1.2 + br; eLy = -0.55; eRy = 0.55;
+    kLx = 1.95; kRx = 1.95; mouthOpen = 0;
   } else if (p.action === "chao") {
-    aRx = -0.3; aRz = -2.1 + Math.sin(t * 9) * 0.45;
-    aLx = sw * 0.06; lLx = 0; lRx = 0; headRx = -0.08;
-    eLx = -0.15; eRx = -0.3; kLx = 0.08; kRx = 0.08;
+    const wv = Math.sin(t * 9);
+    aRx = -0.35 + wv * 0.12; aRz = -2.25 + wv * 0.4;
+    aLx = -0.15 + sw * 0.05; aLz = 0.18; lLx = 0.05; lRx = -0.05;
+    headRx = -0.1; headRy = Math.sin(t * 2.2) * 0.12;
+    eLx = -0.25; eRx = -0.55 + wv * 0.15; kLx = 0.12; kRx = 0.12; mouthOpen = 1;
   } else if (p.action === "hat") {
-    aLz = 2.55; aRz = -2.55; aLx = Math.sin(t * 5) * 0.25; aRx = Math.sin(t * 5 + 1) * 0.25;
-    headRx = Math.sin(t * 5) * 0.12; lLx = 0; lRx = 0;
-    eLx = -0.2; eRx = -0.2; kLx = 0.08; kRx = 0.08;
+    const rh = Math.sin(t * 4.2);
+    aLz = 2.45 + rh * 0.15; aRz = -2.45 - rh * 0.15;
+    aLx = -0.3 + Math.sin(t * 4.2) * 0.22; aRx = -0.3 + Math.sin(t * 4.2 + 1) * 0.22;
+    headRx = -0.22 + Math.sin(t * 4.2) * 0.1; headRy = Math.sin(t * 2.1) * 0.14;
+    bodyRy = Math.sin(t * 2.1) * 0.08; hipRy = Math.sin(t * 2.1) * 0.1;
+    lLx = 0.06; lRx = -0.06;
+    eLx = -0.25; eRx = -0.25; kLx = 0.14; kRx = 0.14; mouthOpen = 1;
   } else if (p.action === "amen") {
-    aLx = -2.7; aRx = -2.7; aLz = 0.3; aRz = -0.3; headRx = -0.3;
-    eLx = -0.15; eRx = -0.15; kLx = 0.08; kRx = 0.08;
+    const lift = Math.sin(Math.min(1, ((now - (u.__amenT || now)) / 600)) * Math.PI);
+    aLx = -2.75; aRx = -2.75; aLz = 0.32; aRz = -0.32; headRx = -0.34;
+    eLx = -0.12; eRx = -0.12; kLx = 0.1; kRx = 0.1; mouthOpen = 1; leanAdd = -0.04;
+    void lift;
   } else if (moving) {
-    const amp = sprinting ? 0.95 : 0.62;
-    aLx = sw * amp; aRx = sw2 * amp;
-    lLx = sw2 * (sprinting ? 0.9 : 0.65); lRx = sw * (sprinting ? 0.9 : 0.65);
-    if (sprinting) { aLx -= 0.25; aRx -= 0.25; }
-    eLx = -0.3 - Math.abs(sw2) * 0.5; eRx = -0.3 - Math.abs(sw) * 0.5;
-    kLx = 0.3 + Math.max(0, -sw2) * 0.9; kRx = 0.3 + Math.max(0, -sw) * 0.9;
+    // Gait nguoi that: STANCE (chan chong, goi gan thang) + SWING (nhac dui -> gap goi -> got ve mong -> duoi ra truoc dap got)
+    // ph = 90 do: chan sau max (toe-off, dap mui) | ph = 180 do: giua swing (goi gap max) | ph = 270 do: chan truoc max (heel-strike, dap got)
+    const amp = (sprinting ? 0.68 : 0.6) * gait;
+    const phL = u.phase + Math.PI, phR = u.phase;
+    const sL = Math.sin(phL), sR = Math.sin(phR);
+    // Goi gap max GIUA swing (chan dang dua tu sau ra truoc): -cos = 1 tai ph = PI
+    const swingBumpL0 = Math.pow(Math.max(0, -Math.cos(phL)), 1.2);
+    const swingBumpR0 = Math.pow(Math.max(0, -Math.cos(phR)), 1.2);
+    // Hong dua truoc/sau; keo dui ve truoc 1 chut giua swing de got roi khoi dat
+    lLx = sL * amp - swingBumpL0 * 0.18 * gait;
+    lRx = sR * amp - swingBumpR0 * 0.18 * gait;
+    aLx = sR * amp * 0.9; aRx = sL * amp * 0.9;
+    if (sprinting) { aLx -= 0.35 * gait; aRx -= 0.35 * gait; }
+    const bendAmp = (sprinting ? 1.75 : 1.65) * gait;
+    // Goi: gan thang khi dap got/dap mui, gap that giua swing (dau goi dua ra truoc, got keo ve mong)
+    const swingBumpL = Math.pow(Math.max(0, -Math.cos(phL)), 2.0);
+    const swingBumpR = Math.pow(Math.max(0, -Math.cos(phR)), 2.0);
+    const stanceL = Math.max(0, sL), stanceR = Math.max(0, sR);
+    kLx = 0.1 + stanceL * 0.14 * gait + swingBumpL * bendAmp;
+    kRx = 0.1 + stanceR * 0.14 * gait + swingBumpR * bendAmp;
+    eLx = -0.35 - Math.abs(sR) * 0.35; eRx = -0.35 - Math.abs(sL) * 0.35;
+    // Co chan 3 pha: dap mui (toe-off, mui chuoi xuong +) -> co mui len lay do cao khi bay -> dap got (got cham dat truoc)
+    const pushL = Math.pow(Math.max(0, sL), 2);
+    const pushR = Math.pow(Math.max(0, sR), 2);
+    const heelL = Math.pow(Math.max(0, -sL), 1.5);
+    const heelR = Math.pow(Math.max(0, -sR), 1.5);
+    u.__ankW_L = (0.8 * pushL - 0.5 * heelL - 0.45 * swingBumpL) * gait;
+    u.__ankW_R = (0.8 * pushR - 0.5 * heelR - 0.45 * swingBumpR) * gait;
+    // Dap got: chan nao vua cham dat thi hui bui nhe + tieng buoc chan (chi nghe tieng chan minh)
+    try {
+      const TAU = Math.PI * 2;
+      const prevPh = (u.__prevPh ?? u.phase);
+      const hitAt = (A) => Math.floor((prevPh - A) / TAU) < Math.floor((u.phase - A) / TAU);
+      const hitL = hitAt(Math.PI / 2), hitR = hitAt(Math.PI * 1.5);
+      u.__prevPh = u.phase;
+      if (gait > 0.5 && (hitL || hitR)) {
+        try { puffAtFoot(m, hitL ? 0 : 1); } catch (e) {}
+        if (id === myId) {
+          const nowMs = performance.now();
+          if (nowMs - (u.__stepSnd || 0) > (sprinting ? 250 : 320)) {
+            u.__stepSnd = nowMs;
+            try { tone(sprinting ? 200 : 165, 0, 0.055, 'triangle', 0.045); } catch (e) {}
+          }
+        }
+      } else { u.__prevPh = u.phase; }
+    } catch (e) {}
+    bodyRy = sR * (sprinting ? 0.1 : 0.06) * gait; hipRy = sL * 0.09 * gait;
+    u.__sway = (sL - sR) * 0.5 * gait;
+    headRy = -bodyRy * 0.7; headRx = sprinting ? -0.06 : 0.02;
+    leanAdd = sprinting ? 0.13 : 0.05;
   } else {
-    aLx = Math.sin(t * 2 + (u.phase || 0)) * 0.06;
-    aRx = Math.sin(t * 2 + (u.phase || 0) + 1) * 0.06;
-    headRx = Math.sin(t * 1.4) * 0.05;
-    eLx = -0.15; eRx = -0.15; kLx = 0.08; kRx = 0.08;
+    // Idle song dong: tho + lac dau nhin xung quanh + tay dua nhe
+    const br2 = Math.sin(t * 1.7) * 0.5 + 0.5;
+    aLx = -0.06 + Math.sin(t * 1.7) * 0.05;
+    aRx = -0.06 + Math.sin(t * 1.7 + 1) * 0.05;
+    aLz = 0.14 + Math.sin(t * 1.7) * 0.015; aRz = -0.14 - Math.sin(t * 1.7 + 0.6) * 0.015;
+    headRx = Math.sin(t * 0.9) * 0.04 + br2 * 0.015;
+    headRy = Math.sin(t * 0.45) * 0.22;
+    bodyRy = Math.sin(t * 0.45) * 0.02;
+    eLx = -0.22 - br2 * 0.06; eRx = -0.22 - br2 * 0.06;
+    kLx = 0.1; kRx = 0.1; mouthOpen = 0; leanAdd = br2 * 0.012;
   }
-  const k = Math.min(1, dt * 14);
-  u.kneel = ((u.kneel ?? 0) + ((kneel ? 1 : 0) - (u.kneel ?? 0)) * Math.min(1, dt * 8));
+  // Toc do noi suy theo trang thai: chuyen dong nhanh, idle cham cho mem
+  const kFast = Math.min(1, dt * (moving || air ? 16 : 10));
+  const kSlow = Math.min(1, dt * 8);
+  u.kneel = ((u.kneel ?? 0) + ((kneel ? 1 : 0) - (u.kneel ?? 0)) * Math.min(1, dt * 7));
   const kn = u.kneel || 0;
-  u.armL.rotation.x += (aLx - u.armL.rotation.x) * k;
-  u.armR.rotation.x += (aRx - u.armR.rotation.x) * k;
-  u.armL.rotation.z += (aLz - u.armL.rotation.z) * k;
-  u.armR.rotation.z += (aRz - u.armR.rotation.z) * k;
-  u.legL.rotation.x += (lLx - u.legL.rotation.x) * k;
-  u.legR.rotation.x += (lRx - u.legR.rotation.x) * k;
-  if (u.elbL) { u.elbL.rotation.x += (eLx - u.elbL.rotation.x) * k; u.elbL.rotation.y += (eLy - u.elbL.rotation.y) * k; }
-  if (u.elbR) { u.elbR.rotation.x += (eRx - u.elbR.rotation.x) * k; u.elbR.rotation.y += (eRy - u.elbR.rotation.y) * k; }
-  if (u.kneeL) u.kneeL.rotation.x += (kLx - u.kneeL.rotation.x) * k;
-  if (u.kneeR) u.kneeR.rotation.x += (kRx - u.kneeR.rotation.x) * k;
-  u.head.rotation.x += (headRx - u.head.rotation.x) * k;
-  // Mat lim dim / nham lai khi cau nguyen (ngoai doi that)
-  if (u.eyes) {
-    const es = 1 - kn * 0.85;
-    for (const e of u.eyes) e.scale.set(1, Math.max(0.12, es), 1);
+  u.armL.rotation.x += (aLx - u.armL.rotation.x) * kFast;
+  u.armR.rotation.x += (aRx - u.armR.rotation.x) * kFast;
+  u.armL.rotation.z += (aLz - u.armL.rotation.z) * kFast;
+  u.armR.rotation.z += (aRz - u.armR.rotation.z) * kFast;
+  u.legL.rotation.x += (lLx - u.legL.rotation.x) * kFast;
+  u.legR.rotation.x += (lRx - u.legR.rotation.x) * kFast;
+  if (u.elbL) { u.elbL.rotation.x += (eLx - u.elbL.rotation.x) * kFast; u.elbL.rotation.y += (eLy - u.elbL.rotation.y) * kFast; }
+  if (u.elbR) { u.elbR.rotation.x += (eRx - u.elbR.rotation.x) * kFast; u.elbR.rotation.y += (eRy - u.elbR.rotation.y) * kFast; }
+  if (u.kneeL) u.kneeL.rotation.x += (kLx - u.kneeL.rotation.x) * kFast;
+  if (u.kneeR) u.kneeR.rotation.x += (kRx - u.kneeR.rotation.x) * kFast;
+  u.head.rotation.x += (headRx - u.head.rotation.x) * Math.min(1, dt * 10);
+  u.head.rotation.y += ((headRy || 0) - (u.head.rotation.y || 0)) * Math.min(1, dt * 8);
+  // Chop mat tu nhien 3-5s/lan + lim dim khi cau nguyen
+  if (u.__blink === undefined) { u.__blink = 2 + Math.random() * 3; u.__blinkShut = 0; }
+  u.__blink -= dt;
+  if (u.__blink <= 0) { u.__blinkShut = 0.14; u.__blink = 2.2 + Math.random() * 3.2; }
+  if (u.__blinkShut > 0) u.__blinkShut -= dt;
+  const shut = Math.max(kn * 0.85, u.__blinkShut > 0 ? 0.92 : 0);
+  const es = 1 - Math.min(1, shut);
+  if (u.eyes) for (const e of u.eyes) e.scale.set(1, Math.max(0.1, es), 1);
+  if (u.pupils) for (const pl of u.pupils) { try { pl.scale.set(1, Math.max(0.1, es), 1); } catch (e) {} }
+  // Mieng mo khi hat/chao/amen (ca hat)
+  if (u.mouth) {
+    const mo = mouthOpen ? 1.35 + Math.sin(t * (p.action === "hat" ? 8 : 5)) * 0.25 : 1;
+    u.mouth.scale.set(mouthOpen ? 1.15 : 1, mo, 1);
   }
-  // Quy goi that: dui hoi dua ra truoc, goi gap manh cho ong chan ep sat ra sau, mong ha thap + nhịp tho nhe
+  // Quy goi: ha mong + tho nhe, di: nhun 2 lan/vong + lac hong sang 2 ben
   const baseY = (p.y || 0);
-  const kneelDrop = kn * 0.38;
+  const kneelDrop = kn * 0.42;
   m.position.y = air ? baseY : baseY - kneelDrop;
-  const bob = moving ? Math.abs(Math.sin(u.phase)) * (sprinting ? 0.09 : 0.05) : (kn > 0.5 ? prayBreath * 0.5 : 0);
-  u.body.position.y += ((1.2 - crouch * 0.4 + bob) - u.body.position.y) * k;
+  const stepBob = Math.abs(Math.sin(u.phase));
+  const bob = moving ? stepBob * (sprinting ? 0.05 : 0.032) * gait : (kn > 0.5 ? prayBreath * 0.4 : Math.sin(t * 1.7) * 0.008);
+  u.body.position.y += ((1.2 - crouch * 0.38 + bob) - u.body.position.y) * kSlow;
+  // Lac hong sang ben chan chong (stance) — nguoi that nghieng nhe moi buoc
+  const swayT = moving ? (u.__sway || 0) * 0.05 : 0;
+  u.body.position.x += ((swayT * 0.6) - (u.body.position.x || 0)) * kSlow;
   if (u.hips) {
-    u.hips.position.y += ((0.62 - kn * 0.18) - u.hips.position.y) * k;
-    u.hips.scale.set(1.05, 0.7 + kn * 0.25, 0.85);
+    u.hips.position.y += ((0.62 - kn * 0.22 + (moving ? stepBob * 0.016 * gait : 0)) - u.hips.position.y) * kSlow;
+    u.hips.position.x += ((swayT) - (u.hips.position.x || 0)) * kSlow;
+    u.hips.scale.set(1.02, 0.72 + kn * 0.22, 0.85);
   }
-  // Mu ban chan ap xuong dat khi quy (mui chan duoi ra sau, khong chong ve truoc)
-  // Giu ban chan luon nam ngang the gioi: local = -(dui + goi)
+  if (u.belt) { u.belt.position.y += ((0.86 - kn * 0.2) - u.belt.position.y) * kSlow; u.belt.position.x = (u.hips ? (u.hips.position.x || 0) : 0); }
+  // Co chan 3 pha: dap got (mui chuoi xuong) -> nhac chan (mui chech len lay do cao) -> dap got
+  // target local = worldMuon - (dui + goi)
   if (u.shoes) {
-    const shL = -(u.legL.rotation.x + (u.kneeL ? u.kneeL.rotation.x : 0));
-    const shR = -(u.legR.rotation.x + (u.kneeR ? u.kneeR.rotation.x : 0));
+    const ankL = moving ? (u.__ankW_L || 0) : 0;
+    const ankR = moving ? (u.__ankW_R || 0) : 0;
+    const shL = ankL - (u.legL.rotation.x + (u.kneeL ? u.kneeL.rotation.x : 0));
+    const shR = ankR - (u.legR.rotation.x + (u.kneeR ? u.kneeR.rotation.x : 0));
     let si = 0;
     for (const sh of u.shoes) {
-      const target = (si === 0 ? shL : shR);
-      sh.rotation.x += (target - sh.rotation.x) * k;
+      const raw = (si === 0 ? shL : shR);
+      const target = Math.max(-1.0, Math.min(1.0, raw));
+      sh.rotation.x += (target - sh.rotation.x) * Math.min(1, dt * 18);
       si++;
     }
   }
-  // Nghieng nguoi ve truoc khi chay (Genshin-style lean) + hoi cui khi quy
-  const lean = air ? -0.08 : sprinting ? 0.14 : moving ? 0.06 : kn * 0.1;
-  u.body.rotation.x += (lean - u.body.rotation.x) * k;
+  // Nghieng + xoay than theo nhip (khong van ca cum)
+  const lean = (air ? -0.08 : sprinting ? 0.13 : moving ? 0.05 : kn * 0.09) + leanAdd;
+  u.body.rotation.x += (lean - u.body.rotation.x) * kSlow;
+  u.body.rotation.y += ((bodyRy || 0) - (u.body.rotation.y || 0)) * kSlow;
+  if (u.hips) u.hips.rotation.y += (((hipRy || 0) * 0.7) - (u.hips.rotation.y || 0)) * kSlow;
   // Bong tron gia duoi chan: nho + mo dan khi nhay len
   if (u.blob) {
     const h = (p.y || 0);
@@ -2091,15 +2292,17 @@ function showBubble(id, text) {
 }
 function projectBubbles() {
   const layer = document.getElementById("bubble-layer");
-  for (const [id, m] of meshes) {
+  const place = (id, m) => {
     const el = document.getElementById("bub-" + id);
-    if (!el) continue;
-    if (Date.now() > +el.dataset.until) { el.remove(); continue; }
+    if (!el) return;
+    if (Date.now() > +el.dataset.until) { el.remove(); return; }
     const v = new THREE.Vector3(); m.getWorldPosition(v); v.y += 3.2; v.project(camera);
     el.style.left = ((v.x * 0.5 + 0.5) * innerWidth) + "px";
     el.style.top = ((-v.y * 0.5 + 0.5) * innerHeight) + "px";
-  }
-  if (layer.children.length > 12) layer.firstChild.remove();
+  };
+  for (const [id, m] of meshes) place(id, m);
+  try { if (typeof NPCS !== "undefined") for (const n of NPCS) { try { if (n.m.visible) place(n.p.id, n.m); } catch (e) {} } } catch (e) {}
+  if (layer.children.length > 14) { try { layer.firstChild.remove(); } catch (e) {} }
 }
 socket.on("init", ({ id, zone, players: list, gx, boards, mass, candles }) => {
   myId = id;
@@ -2125,6 +2328,7 @@ socket.on("init", ({ id, zone, players: list, gx, boards, mass, candles }) => {
 });
 socket.on("player-join", addPlayer);
 socket.on("player-faith", ({ id, faith }) => {
+  try { if (id === myId) syncFaith(faith); } catch (e2) {}
   const p = players.get(id);
   if (!p) return;
   p.faith = Math.max(0, Number(faith) || 0);
@@ -2572,7 +2776,28 @@ function fanfare(big) {
   } catch (e) {}
   if (navigator.vibrate) { try { navigator.vibrate(big ? [40, 60, 40, 60, 80] : 25); } catch (e) {} }
 }
-function addFaith(n, why) {
+window.__grace = window.__grace || { active: false, left: 0 };
+window.__combo = window.__combo || { n: 0, last: 0 };
+function graceOn() { try { return window.__grace && window.__grace.active; } catch (e) { return false; } }
+function comboMult() {
+  try {
+    const now = Date.now();
+    if (now - window.__combo.last > 10000) window.__combo.n = 0;
+    const c = window.__combo.n || 0;
+    if (c >= 12) return 3;
+    if (c >= 7) return 2;
+    if (c >= 3) return 1.5;
+  } catch (e) {}
+  return 1;
+}
+function addFaith(n, why, fromServer) {
+  const now0 = Date.now();
+  if (now0 - (window.__combo.last || 0) <= 10000) window.__combo.n = Math.min(20, (window.__combo.n || 0) + 1);
+  else window.__combo.n = 1;
+  window.__combo.last = now0;
+  let mult = comboMult();
+  if (graceOn() && !fromServer) n = n * 2;
+  n = Math.round(n * mult);
   const before = faithLevel(__faith);
   __faith += n;
   __store.set("ntho_faith", __faith);
@@ -2588,15 +2813,32 @@ function addFaith(n, why) {
     }
   } catch (e) {}
   const after = faithLevel(__faith);
+  let tag = "";
+  try {
+    if (graceOn()) tag += " 🌧️x2";
+    const cm = comboMult();
+    if (cm > 1) tag += " 🔥x" + cm + " (" + (window.__combo.n || 0) + " combo)";
+  } catch (e) {}
   if (after > before) {
-    toast("🎉 Thăng cấp Đức Tin Lv" + after + "! " + (why || ""));
+    toast("🎉 Thăng cấp Đức Tin Lv" + after + "! " + (why || "") + tag);
     fanfare(true);
     try { showBubble(myId, "🎉 Lên Lv" + after + "!"); } catch (e) {}
   } else if (why) {
-    toast("+" + n + "✦ " + why);
+    toast("+" + n + "✦ " + why + tag);
     fanfare(false);
   }
   renderQuests();
+}
+function syncFaith(nf) {
+  try {
+    nf = Math.max(0, Number(nf) || 0);
+    if (nf > __faith) {
+      __faith = nf;
+      __store.set("ntho_faith", __faith);
+      renderFaith();
+      try { socket.emit("report-faith", { faith: __faith }); } catch (e) {}
+    }
+  } catch (e) {}
 }
 const QUESTS = [
   { id: "pray", icon: "🙏", name: "QUEST_PRAY", need: 3, reward: 40, val: () => __qd.pray },
@@ -2692,6 +2934,145 @@ const RELICS = [];
   mkRelic("relic-3", "church-3", 0, 0, 20.5);
   refreshRelics();
 })();
+// ---- NPC giao dan (cho solo cung thay am, co nguoi doc kinh chung) ----
+const NPCS = [];
+(function buildNPCs() {
+  try {
+    const names = ["Maria", "Gioan", "Phêrô", "Anna", "Giuse", "Têrêsa", "Lucia", "Phaolô", "Marta", "Tôma", "Rosa", "Đaminh"];
+    const aos = ["xanh", "trang", "den", "do", "tim"];
+    const zones = ["street", "church-1", "church-2", "church-3"];
+    let ni = 0;
+    for (const z of zones) {
+      for (let k = 0; k < 4; k++) {
+        const b = (typeof BOUNDS !== "undefined" && BOUNDS[z]) ? BOUNDS[z] : { x: [-14, 14], z: [-14, 20] };
+        const px = b.x[0] + 2 + Math.random() * Math.max(1, (b.x[1] - b.x[0] - 4));
+        const pz = b.z[0] + 2 + Math.random() * Math.max(1, (b.z[1] - b.z[0] - 4));
+        const p = { id: "npc-" + (ni), name: names[(ni + k * 3) % names.length], ao: aos[(ni + k) % aos.length], zone: z, x: px, z: pz, y: 0, ry: Math.random() * 6.28, action: "idle", faith: 50 + ((ni * 37) % 300) };
+        try {
+          const m = makeAvatar(p);
+          m.position.set(px, 0, pz);
+          m.visible = (typeof currentZone !== "undefined" ? (z === currentZone) : (z === "street"));
+          scene.add(m);
+          NPCS.push({ p, m, wt: Math.random() * 4, t: Math.random() * 10, tx: px, tz: pz });
+        } catch (e) {}
+        ni++;
+      }
+    }
+  } catch (e) {}
+})();
+window.NPCS = NPCS;
+window.__npcCount = NPCS.length;
+function tickNPCs(dt, t) {
+  try {
+    for (const n of NPCS) {
+      try { n.m.visible = (n.p.zone === currentZone); } catch (e) {}
+      if (!n.m.visible) continue;
+      n.t -= dt;
+      if (n.t <= 0) {
+        n.t = 3 + Math.random() * 6;
+        const r = Math.random();
+        if (r < 0.45) { n.p.action = "cau-nguyen"; }
+        else if (r < 0.62) { n.p.action = "hat"; }
+        else if (r < 0.70) { n.p.action = "chao"; }
+        else { n.p.action = "idle"; }
+        // doi cho lang thang quanh cho ngoi
+        const b = (typeof BOUNDS !== "undefined" && BOUNDS[n.p.zone]) ? BOUNDS[n.p.zone] : { x: [-14, 14], z: [-14, 20] };
+        n.tx = Math.max(b.x[0] + 1, Math.min(b.x[1] - 1, n.p.x + (Math.random() - 0.5) * 10));
+        n.tz = Math.max(b.z[0] + 1, Math.min(b.z[1] - 1, n.p.z + (Math.random() - 0.5) * 10));
+        if (Math.random() < 0.22) {
+          const says = ["Amen 🙏", "Alleluia 🎵", "Bình an 👋", "Tạ ơn Chúa ✝️"];
+          try { showBubble(n.p.id, says[Math.floor(Math.random() * says.length)]); } catch (e) {}
+        }
+        try { n.m.position.y = 0; } catch (e) {}
+      }
+      // di cham ve diem den
+      try {
+        const dx = n.tx - n.p.x, dz = n.tz - n.p.z;
+        const d = Math.hypot(dx, dz);
+        if (d > 0.6 && n.p.action === "idle") {
+          const sp = 1.2 * dt;
+          n.p.x += dx / d * sp; n.p.z += dz / d * sp;
+          n.p.ry = Math.atan2(dx, dz);
+          n.m.position.set(n.p.x, 0, n.p.z);
+          n.m.rotation.y = n.p.ry;
+        } else {
+          n.m.position.set(n.p.x, n.p.y || 0, n.p.z);
+          n.m.rotation.y = n.p.ry || 0;
+        }
+        try { tickAvatar(n.p.id, n.p, n.m, dt, performance.now()); } catch (e) {}
+      } catch (e) {}
+    }
+  } catch (e) {}
+}
+// ---- Anh sang on lanh: orb nhat duoc, 12s moc 1 vien quanh nguoi choi ----
+const GRACE_ORBS = [];
+(function buildGraceOrbs() {
+  try {
+    const gold = new THREE.MeshStandardMaterial({ color: 0xffe9a0, emissive: 0xffb400, emissiveIntensity: 1.2, roughness: 0.3 });
+    for (let i = 0; i < 8; i++) {
+      const g = new THREE.Group();
+      const core = new THREE.Mesh(new THREE.SphereGeometry(0.35, 12, 10), gold);
+      core.position.y = 1.1; g.add(core);
+      const cv = document.createElement("canvas"); cv.width = cv.height = 64;
+      const c2 = cv.getContext("2d");
+      const gr = c2.createRadialGradient(32, 32, 2, 32, 32, 30);
+      gr.addColorStop(0, "rgba(255,240,180,1)"); gr.addColorStop(0.5, "rgba(255,200,80,.5)"); gr.addColorStop(1, "rgba(255,200,80,0)");
+      c2.fillStyle = gr; c2.fillRect(0, 0, 64, 64);
+      const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
+      const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0.9, depthWrite: false }));
+      glow.scale.set(2.2, 2.2, 1); glow.position.y = 1.1; g.add(glow);
+      g.visible = false; scene.add(g);
+      GRACE_ORBS.push({ obj: g, core, x: 0, z: 0, zone: "street", life: 0 });
+    }
+  } catch (e) {}
+})();
+window.GRACE_ORBS = GRACE_ORBS;
+function spawnGraceOrb() {
+  try {
+    const me = (typeof players !== "undefined" && typeof myId !== "undefined") ? players.get(myId) : null;
+    const free = GRACE_ORBS.find(o => !o.obj.visible);
+    if (!free || !me) return;
+    const b = (typeof BOUNDS !== "undefined" && BOUNDS[currentZone]) ? BOUNDS[currentZone] : { x: [-14, 14], z: [-14, 20] };
+    for (let k = 0; k < 8; k++) {
+      const ax = me.x + (Math.random() - 0.5) * 16;
+      const az = me.z + (Math.random() - 0.5) * 16;
+      if (ax < b.x[0] + 1 || ax > b.x[1] - 1 || az < b.z[0] + 1 || az > b.z[1] - 1) continue;
+      free.x = ax; free.z = az; free.zone = currentZone; free.life = 25;
+      free.obj.position.set(ax, 0, az);
+      free.obj.visible = true;
+      try { tone(1200, 0, 0.3, "sine", 0.08); } catch (e) {}
+      return;
+    }
+  } catch (e) {}
+}
+function checkGraceOrbs(dt, t) {
+  try {
+    const me = (typeof players !== "undefined" && typeof myId !== "undefined") ? players.get(myId) : null;
+    let active = 0;
+    for (const o of GRACE_ORBS) {
+      if (!o.obj.visible) continue;
+      if (o.zone !== currentZone) { o.obj.visible = false; continue; }
+      active++;
+      o.life -= dt;
+      o.obj.position.y = Math.sin(t * 3 + o.x) * 0.15;
+      o.core.rotation.y += dt * 2.5;
+      if (o.life <= 0) { o.obj.visible = false; continue; }
+      if (me) {
+        const d = Math.hypot(me.x - o.x, me.z - o.z);
+        if (d < 2.0) {
+          o.obj.visible = false;
+          try { addFaith(10, (LANG() === "en" ? "picked grace light" : "nhặt ánh sáng ơn lành") + " ✨"); } catch (e) {}
+          try { showBubble(myId, "✨ +10"); } catch (e) {}
+          try { fanfare(false); } catch (e) {}
+          try { trackQuest("relic"); } catch (e) {}
+          if (navigator.vibrate) { try { navigator.vibrate(20); } catch (e) {} }
+        }
+      }
+    }
+    // giu 2-3 vien quanh nguoi choi cho luon co viec nhat
+    if (active < 2 && Math.random() < dt * 0.25) spawnGraceOrb();
+  } catch (e) {}
+}
 function refreshRelics() {
   for (const r of RELICS) {
     const got = __collected.includes(r.id);
@@ -3009,8 +3390,9 @@ try {
       try { if (navigator.vibrate) navigator.vibrate([50, 80, 50]); } catch (e2) {}
     }
   });
-  socket.on("mass-reward", ({ bonus }) => {
-    try { addFaith(bonus, (LANG()==="en" ? "joined community prayer" : "d\u1EF1 gi\u1EDD kinh chung") + " \u26EA"); } catch (e2) {}
+  socket.on("mass-reward", ({ bonus, faith }) => {
+    try { if (typeof faith === "number") syncFaith(faith); } catch (e2) {}
+    try { toast((LANG()==="en" ? "Joined community prayer +" : "Dự giờ kinh chung +") + (bonus || 0) + "✦ ⛪"); } catch (e2) {}
     try { showBubble(myId, (LANG()==="en" ? "\u26EA Devout Mass!" : "\u26EA D\u1EF1 l\u1EC5 s\u1ED1t s\u1EAFng!")); } catch (e2) {}
     const ck = document.getElementById("massCheckin");
     if (ck) { ck.disabled = true; ck.style.opacity = 0.55; ck.textContent = (LANG()==="en" ? "\u2705 Checked in" : "\u2705 \u0110\u00E3 \u0111i\u1EC3m danh"); }
@@ -3091,8 +3473,8 @@ function renderLit() {
     const panel = document.getElementById("litPanel");
     if (panel) panel.classList.add("hidden");
   });
-  socket.on("lit-result", ({ ok, gain }) => {
-    try { addFaith(gain, (ok ? (LANG()==="en" ? "fervent response" : "\u0111\u00E1p l\u1EC5 s\u1ED1t s\u1EAFng") : (LANG()==="en" ? "joined prayer" : "d\u1EF1 l\u1EC5")) + " "); } catch (e2) {}
+  socket.on("lit-result", ({ ok, gain, faith }) => {
+    try { if (typeof faith === "number") syncFaith(faith); } catch (e2) {}
     if (ok) { try { fanfare(false); } catch (e2) {} toast((LANG()==="en" ? "\u2705 Correct +6!" : "\u2705 \u0110\u00E1p \u0111\u00FAng +6\u2726!")); }
     else toast((LANG()==="en" ? "\uD83D\uDE4F United in prayer +1" : "\uD83D\uDE4F \u0110\u00E3 hi\u1EC7p th\u00F4ng +1\u2726"));
   });
@@ -3137,34 +3519,187 @@ function renderLit() {
   if (__mg) __mg.onclick = () => socket.emit("switch-zone", { zone: "church-1" });
   const __mc = document.getElementById("massCheckin");
   if (__mc) __mc.onclick = () => socket.emit("mass-checkin");
-  setInterval(() => { try { renderMass(); } catch (e2) {} }, 1000);
+  setInterval(() => { try { renderMass(); } catch (e2) {} try { renderGrace(); } catch (e2) {} try { renderCombo(); } catch (e2) {} }, 1000);
   try { socket.emit("get-mass"); } catch (e2) {}
+  // ---- Mua on lanh: thanh x2 + dem nguoc ----
+  window.__graceEndsAt = window.__graceEndsAt || 0;
+  window.__quiz = window.__quiz || null;
+  window.__quizEndsAt = window.__quizEndsAt || 0;
+  function renderGrace() {
+    const bar = document.getElementById("graceBar"), tx = document.getElementById("graceTxt");
+    if (!bar || !tx) return;
+    let active = false, left = 0;
+    try {
+      if (window.__grace && window.__grace.active) { active = true; left = Math.max(0, Math.ceil(((window.__graceEndsAt || 0) - Date.now()) / 1000)); if (!window.__graceEndsAt) left = Math.ceil((window.__grace.left || 0) / 1000); }
+      else if (window.__mass && window.__mass.grace && window.__mass.grace.active) { active = true; left = Math.max(0, Math.ceil((window.__mass.grace.left || 0) / 1000)); }
+    } catch (e) {}
+    if (active) {
+      bar.classList.remove("hidden");
+      tx.textContent = (LANG() === "en" ? "🌧️ Grace Rain · x2 all ✦ · " : "🌧️ Mưa ơn lành · x2 mọi ✦ · còn ") + left + "s";
+    } else bar.classList.add("hidden");
+  }
+  function renderCombo() {
+    const pill = document.getElementById("comboPill");
+    if (!pill) return;
+    let n = 0, ok = false;
+    try {
+      const dt = Date.now() - (window.__combo.last || 0);
+      n = window.__combo.n || 0;
+      ok = n >= 2 && dt <= 10000;
+    } catch (e) {}
+    if (!ok) { pill.classList.add("hidden"); return; }
+    pill.classList.remove("hidden");
+    const mult = n >= 12 ? 3 : n >= 7 ? 2 : n >= 3 ? 1.5 : 1;
+    pill.textContent = "🔥 Combo x" + n + (mult > 1 ? " · ✦ x" + mult : "");
+    pill.classList.toggle("hot", n >= 7);
+  }
+  socket.on("grace", (g) => {
+    try {
+      window.__grace = g || { active: false };
+      window.__graceEndsAt = g && g.active ? Date.now() + (g.left || 0) : 0;
+      renderGrace();
+      if (g && g.active) {
+        toast(LANG() === "en" ? "🌧️ GRACE RAIN! x2 all ✦ for 60s!" : "🌧️ MƯA ƠN LÀNH! x2 mọi ✦ trong 60s!");
+        try { fanfare(true); } catch (e2) {}
+        try { if (navigator.vibrate) navigator.vibrate([60, 60, 60]); } catch (e2) {}
+      }
+    } catch (e) {}
+  });
+  socket.on("mass", (m2) => {
+    try {
+      if (m2 && m2.grace) { window.__grace = m2.grace; if (m2.grace.active && m2.grace.left) window.__graceEndsAt = Date.now() + m2.grace.left; }
+      renderGrace();
+    } catch (e) {}
+  });
+  // ---- Do Kinh Thanh: panel 4 dap an, 25s ----
+  function renderQuiz() {
+    const panel = document.getElementById("quizPanel");
+    if (!panel) return;
+    const q = window.__quiz;
+    if (!q) { panel.classList.add("hidden"); return; }
+    const left = Math.max(0, Math.ceil(((window.__quizEndsAt || 0) - Date.now()) / 1000));
+    if (left <= 0) { panel.classList.add("hidden"); return; }
+    panel.classList.remove("hidden");
+    const en = LANG() === "en";
+    const title = document.getElementById("quizTitle"), timer = document.getElementById("quizTimer");
+    const qq = document.getElementById("quizQ"), box = document.getElementById("quizOpts");
+    if (title) title.textContent = en ? "📖 Bible Quiz" : "📖 Đố Kinh Thánh";
+    if (timer) timer.textContent = "⏳ " + left + "s";
+    if (qq && box && box.dataset.qid !== String(q.qid)) {
+      box.dataset.qid = String(q.qid);
+      box.innerHTML = "";
+      qq.textContent = "❓ " + (en ? (q.q_en || q.q) : q.q);
+      const opts = en ? (q.opts_en || q.opts) : q.opts;
+      (opts || []).forEach((op, i) => {
+        const b = document.createElement("button");
+        b.textContent = op;
+        b.onclick = () => {
+          try { socket.emit("quiz-answer", { qid: q.qid, idx: i }); } catch (err) {}
+          try { showBubble(myId, op); } catch (err) {}
+          box.querySelectorAll("button").forEach((x) => { x.disabled = true; x.style.opacity = 0.55; });
+          b.style.opacity = 1; b.style.borderColor = "#9dc2ff";
+        };
+        box.appendChild(b);
+      });
+    } else if (timer) { timer.textContent = "⏳ " + left + "s"; }
+  }
+  socket.on("quiz", (q) => {
+    try {
+      window.__quiz = q;
+      window.__quizEndsAt = Date.now() + ((q && q.left) || 25) * 1000;
+      renderQuiz();
+      toast(LANG() === "en" ? "📖 Bible Quiz! Fast correct = +20✦" : "📖 Đố Kinh Thánh! Nhanh + đúng = +20✦");
+      try { fanfare(false); } catch (e2) {}
+    } catch (e) {}
+  });
+  socket.on("quiz-end", ({ correct, winner }) => {
+    try {
+      const box = document.getElementById("quizOpts");
+      if (box) box.querySelectorAll("button").forEach((x, i) => { if (i === correct) x.classList.add("correct"); });
+      setTimeout(() => { window.__quiz = null; const p = document.getElementById("quizPanel"); if (p) p.classList.add("hidden"); }, 4000);
+      if (winner) toast((LANG() === "en" ? "🏆 " : "🏆 ") + winner + (LANG() === "en" ? " answered first!" : " trả lời đúng đầu tiên!"));
+    } catch (e) {}
+  });
+  socket.on("quiz-result", ({ ok, gain, faith }) => {
+    try { if (typeof faith === "number") syncFaith(faith); } catch (e2) {}
+    try {
+      if (ok) { try { fanfare(false); } catch (e2) {} toast((LANG() === "en" ? "✅ Correct +" : "✅ Đáp đúng +") + gain + "✦!"); }
+      else toast("🙏 " + (LANG() === "en" ? "Joined +1✦" : "Hiệp thông +1✦"));
+    } catch (e) {}
+  });
+  socket.on("quiz-first", ({ name }) => {
+    try { toast("⚡ " + name + (LANG() === "en" ? " was fastest!" : " nhanh nhất!")); } catch (e) {}
+  });
+  setInterval(() => { try { renderQuiz(); } catch (e2) {} }, 500);
 } catch (e) {}
-// ================= TOUR TAN THU 30s (chi 1 lan) =================
-function startTour() {
+// ================= TOUR TAN THU DAY DU (co nut Bo qua + Xem lai) =================
+let __tourIdx = 0, __tourHl = null;
+function __tourSteps() {
+  const en = LANG() === 'en';
+  return [
+    { sel: null, t: en ? "👋 Welcome to Church Online!" : "👋 Chào bạn đến Nhà Thờ Online!", d: en ? "A 3D church game: pray, light candles, join Mass, answer Bible quizzes and climb the faith leaderboard. This 30s tour shows everything." : "Game nhà thờ 3D: cầu nguyện, thắp nến, dự lễ, đố Kinh Thánh, đua BXH đức tin. Tour 30s này chỉ hết mọi nút quan trọng." },
+    { sel: "#joystick", t: en ? "🕹️ Move" : "🕹️ Di chuyển", d: en ? "Drag the left joystick to walk (WASD/arrows on PC). Drag on empty screen to rotate camera like Genshin." : "Kéo joystick trái để đi bộ (PC: WASD/mũi tên). Vuốt ra màn hình trống để xoay camera kiểu Genshin." },
+    { sel: '#actions button[data-act="cau-nguyen"]', t: en ? "🙏 Pray (kneel)" : "🙏 Cầu nguyện (quỳ)", d: en ? "Tap 🙏 to kneel. Hold 20s for +5✦ and quest progress. Tap again to stand." : "Bấm 🙏 để quỳ gối. Quỳ đủ 20s được +5✦ và tính nhiệm vụ. Bấm lại để đứng dậy." },
+    { sel: "#moveBtns", t: en ? "🏃 Run · ⬆ Jump · 🎵 Sing" : "🏃 Chạy · ⬆ Nhảy · 🎵 Hát", d: en ? "Hold 🏃 + move to sprint. ⬆ to jump. 🎵👋✝️ = sing, greet, amen — each gives ✦ and shows a bubble." : "Giữ 🏃 + di chuyển để chạy. ⬆ để nhảy. 🎵👋✝️ = hát, chào, amen — mỗi cái đều +✦ và hiện bong bóng." },
+    { sel: "#chatbar", t: en ? "💬 Send a prayer" : "💬 Gửi lời nguyện", d: en ? "Type a prayer and Send — counts for the daily chat quest (+20✦) and everyone sees it." : "Gõ lời nguyện rồi Gửi — tính nhiệm vụ chat ngày (+20✦), mọi người đều thấy." },
+    { sel: "#questBtn", t: en ? "📜 Quests + check-in" : "📜 Nhiệm vụ + điểm danh", d: en ? "Open 📜 daily: pray 3x, visit 3 churches, 1 prayer, 150m pilgrimage, 1 relic. Check in every day for streak ✦." : "Mở 📜 mỗi ngày: cầu nguyện 3 lần, viếng 3 nhà thờ, 1 lời nguyện, hành hương 150m, 1 thánh tích. Điểm danh mỗi ngày giữ chuỗi 🔥." },
+    { sel: "#candleTopBtn", t: en ? "🕯️ Candles · 📿 Rosary · 💜 Confession" : "🕯️ Nến · 📿 Mân Côi · 💜 Xưng tội", d: en ? "🕯️ light a candle (+5✦), 📿 pray the rosary decade by decade, 💜 examine conscience for up to +30✦." : "🕯️ thắp nến (+5✦), 📿 lần hạt Mân Côi từng chục, 💜 xét mình xưng tội tới +30✦." },
+    { sel: "#boardBtn", t: en ? "🏆 Ranks · ⛪ Mass · 📖 Quiz" : "🏆 BXH · ⛪ Lễ · 📖 Quiz", d: en ? "🏆 parish/personal ranks. ⛪ Community prayer 8PM (+30✦ check-in). 📖 Bible quiz every few minutes — fastest correct wins big ✦." : "🏆 BXH giáo xứ/cá nhân. ⛪ Giờ kinh chung 20h (điểm danh +30✦). 📖 Đố Kinh Thánh vài phút 1 lần — ai nhanh tay đúng nhất thắng lớn ✦." },
+    { sel: "#mapBtn", t: en ? "🗺️ Map & churches" : "🗺️ Bản đồ & nhà thờ", d: en ? "Tap 🗺️ or walk to the ⛪ gate to switch: Parish Street, Notre-Dame, Vatican, Sagrada Familia." : "Bấm 🗺️ hoặc đi tới cổng ⛪ để chuyển: Phố Giáo Xứ, Đức Bà, Vatican, Sagrada Familia." },
+  ];
+}
+function __tourEnd(save) {
+  try { document.querySelectorAll(".tour-hl").forEach(e => e.classList.remove("tour-hl")); } catch (e) {}
+  __tourHl = null;
+  try { document.getElementById("tourOverlay").classList.add("hidden"); } catch (e) {}
+  try { document.getElementById("tourCard").classList.add("hidden"); } catch (e) {}
+  if (save) { try { localStorage.setItem("ntho_tour_done", "1"); } catch (e) {} }
+}
+function __tourRender() {
+  const steps = __tourSteps();
+  const i = Math.max(0, Math.min(steps.length - 1, __tourIdx));
+  __tourIdx = i;
+  const st = steps[i];
+  const en = LANG() === 'en';
+  try { document.querySelectorAll(".tour-hl").forEach(e => e.classList.remove("tour-hl")); } catch (e) {}
+  __tourHl = null;
+  if (st.sel) { try { const el = document.querySelector(st.sel); if (el) { el.classList.add("tour-hl"); __tourHl = el; el.scrollIntoView({ block: "nearest" }); } } catch (e) {} }
+  try { document.getElementById("tourTitle").textContent = st.t; } catch (e) {}
+  try { document.getElementById("tourDesc").textContent = ((i + 1) + "/" + steps.length + " · ") + st.d; } catch (e) {}
+  try {
+    const dots = document.getElementById("tourDots"); dots.innerHTML = "";
+    steps.forEach((_, k) => { const d = document.createElement("i"); if (k === i) d.className = "on"; dots.appendChild(d); });
+  } catch (e) {}
+  try { document.getElementById("tourBack").style.visibility = i === 0 ? "hidden" : "visible"; } catch (e) {}
+  try { document.getElementById("tourNext").textContent = i === steps.length - 1 ? (en ? "Done ✝️" : "Xong ✝️") : (en ? "Next →" : "Tiếp →"); } catch (e) {}
+  try { document.getElementById("tourSkip").textContent = en ? "Skip" : "Bỏ qua"; } catch (e) {}
+}
+function startTour(force) {
   let done = false;
   try { done = !!localStorage.getItem("ntho_tour_done"); } catch (e) {}
-  if (done) return;
-  const steps = (LANG() === 'en' ? [
-    "\uD83D\uDE4F Tap Pray to kneel — kneel 20s for +5",
-    "\uD83D\uDD6F\uFE0F Tap the candle button to light a prayer candle",
-    "\uD83D\uDCDC Tap quests for daily tasks + check-in",
-    "\uD83D\uDDFA\uFE0F Tap MAP or walk to the \u26EA gate to enter!",
-  ] : [
-    "\uD83D\uDE4F Bấm nút Cầu nguyện để quỳ gối — quỳ 20s được +5✦",
-    "\uD83D\uDD6F\uFE0F Bấm nút trên đầu để thắp nến nguyện",
-    "\uD83D\uDCDC Bấm NV làm nhiệm vụ ngày + điểm danh",
-    "\uD83D\uDDFA\uFE0F Bấm MAP hoặc đi tới cổng \u26EA để vào nhà thờ!",
-  ]);
-  let i = 0;
-  const show = () => {
-    if (i >= steps.length) { try { localStorage.setItem("ntho_tour_done", "1"); } catch (e) {} return; }
-    toast("👉 " + steps[i], 3000);
-    i++;
-    setTimeout(show, 3200);
-  };
-  setTimeout(show, 2500);
+  if (done && !force) return;
+  __tourIdx = 0;
+  try { document.getElementById("tourOverlay").classList.remove("hidden"); } catch (e) {}
+  try { document.getElementById("tourCard").classList.remove("hidden"); } catch (e) {}
+  __tourRender();
 }
+(function __wireTour() {
+  const nxt = document.getElementById("tourNext");
+  const back = document.getElementById("tourBack");
+  const skip = document.getElementById("tourSkip");
+  if (nxt && !nxt.__wired) {
+    nxt.__wired = true;
+    nxt.onclick = () => {
+      const n = __tourSteps().length;
+      if (__tourIdx >= n - 1) { __tourEnd(true); try { toast(T("toast_quest")); } catch (e) {} }
+      else { __tourIdx++; __tourRender(); }
+    };
+  }
+  if (back && !back.__wired) { back.__wired = true; back.onclick = () => { __tourIdx = Math.max(0, __tourIdx - 1); __tourRender(); }; }
+  if (skip && !skip.__wired) { skip.__wired = true; skip.onclick = () => __tourEnd(true); }
+  const help = document.getElementById("helpBtn");
+  if (help && !help.__wired) { help.__wired = true; help.onclick = (e) => { try { e.stopPropagation(); } catch (e2) {} startTour(true); }; }
+})();
 // Hook hanh dong de cong duc tin + tien trinh nhiem vu
 document.querySelectorAll("#actions button").forEach(b => b.addEventListener("click", () => {
   const act = b.dataset.act;
@@ -3246,10 +3781,9 @@ function tick() {
       while (_d < -Math.PI) _d += Math.PI * 2;
       const _maxTurn = 10 * dt;
       me.ry += Math.max(-_maxTurn, Math.min(_maxTurn, _d));
-      // Nhun nhe + vung tay chan (he thong animation moi)
+      // Nhun + vung tay chan do tickAvatar lo (khoa theo toc do that)
       mm.position.set(me.x, me.y || 0, me.z); mm.rotation.y = me.ry;
       tickAvatar(myId, me, mm, dt, __now);
-      mm.position.y += Math.abs(Math.sin(__now / (__sprinting ? 110 : 180))) * (__sprinting ? 0.06 : 0.035);
       if (Date.now() - lastSend > 80) { socket.emit("move", { x: me.x, z: me.z, y: me.y || 0, ry: me.ry }); lastSend = Date.now(); }
     }
     // Vat ly nhay: y + vy, trong luc keo xuong
@@ -3297,6 +3831,9 @@ function tick() {
   } else { camera.position.set(0, 10, 24); camera.lookAt(0, 2, -10); }
   projectBubbles();
   if (__frames % 10 === 0) { try { checkPortals(); } catch (e) {} try { checkRelics(); } catch (e) {} }
+  try { tickNPCs(dt, __now / 1000); } catch (e) {}
+  try { checkGraceOrbs(dt, __now / 1000); } catch (e) {}
+  try { tickPuffs(dt); } catch (e) {}
   try {
     const t = __now / 1000;
     try {
@@ -3371,14 +3908,14 @@ function tick() {
           pl.position.set(me0.x, 1.7, me0.z);
         }
       } catch (e) {}
-      // Thuong tinh nguyen theo moc: 10s +3✦, 20s +5✦, 40s +10✦, 60s +15✦ + thanh tien trinh
+      // Thuong tinh nguyen theo moc NHANH: 3s +3✦, 8s +5✦, 15s +10✦, 30s +15✦ + thanh tien trinh
       try {
         const w0b = window.__ntho, me0b = w0b && myId ? w0b.players.get(myId) : null;
         const pb = document.getElementById("prayBar"), pf = document.getElementById("prayFill"), pt = document.getElementById("prayTxt");
         if (me0b && me0b.action === "cau-nguyen") {
           window.__prayAcc = (window.__prayAcc || 0) + dt;
           const acc = window.__prayAcc;
-          const stage = acc >= 60 ? 3 : acc >= 40 ? 2 : acc >= 20 ? 1 : acc >= 10 ? 0 : -1;
+          const stage = acc >= 30 ? 3 : acc >= 15 ? 2 : acc >= 8 ? 1 : acc >= 3 ? 0 : -1;
           if (window.__prayStage === undefined) window.__prayStage = -1;
           if (stage > window.__prayStage) {
             window.__prayStage = stage;
@@ -3390,9 +3927,9 @@ function tick() {
           }
           if (pb) {
             pb.classList.remove("hidden");
-            const pct = Math.min(100, acc / 60 * 100);
+            const pct = Math.min(100, acc / 30 * 100);
             if (pf) pf.style.width = pct + "%";
-            if (pt) pt.textContent = (LANG()==="en" ? ("Praying " + Math.floor(acc) + "s" + (acc >= 60 ? " - complete" : acc >= 40 ? " - +15 at 60s" : acc >= 20 ? " - +10 at 40s" : acc >= 10 ? " - +5 at 20s" : " - +3 at 10s")) : ("Tĩnh nguyện " + Math.floor(acc) + "s" + (acc >= 60 ? " · viên mãn" : acc >= 40 ? " · +15 ở 60s" : acc >= 20 ? " · +10 ở 40s" : acc >= 10 ? " · +5 ở 20s" : " · +3 ở 10s")));
+            if (pt) pt.textContent = (LANG()==="en" ? ("Praying " + Math.floor(acc) + "s" + (acc >= 30 ? " · complete" : acc >= 15 ? " · +15 at 30s" : acc >= 8 ? " · +10 at 15s" : acc >= 3 ? " · +5 at 8s" : " · +3 at 3s")) : ("Tĩnh nguyện " + Math.floor(acc) + "s" + (acc >= 30 ? " · viên mãn" : acc >= 15 ? " · +15 ở 30s" : acc >= 8 ? " · +10 ở 15s" : acc >= 3 ? " · +5 ở 8s" : " · +3 ở 3s")));
           }
         } else {
           window.__prayAcc = 0; window.__prayStage = -1;
